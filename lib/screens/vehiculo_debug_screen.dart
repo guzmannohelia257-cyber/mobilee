@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/auth_service.dart';
 import '../services/vehiculo_service.dart';
 
@@ -108,16 +109,16 @@ class _VehiculoDebugScreenState extends State<VehiculoDebugScreen> {
                   Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: testResult.startsWith('✅') ? Colors.green.shade100 : Colors.red.shade100,
+                      color: testResult.startsWith('✅') ? Colors.green.shade100 : AppColors.dangerSoft,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: testResult.startsWith('✅') ? Colors.green : Colors.red,
+                        color: testResult.startsWith('✅') ? Colors.green : AppColors.danger,
                       ),
                     ),
                     child: Text(
                       testResult,
                       style: TextStyle(
-                        color: testResult.startsWith('✅') ? Colors.green.shade700 : Colors.red.shade700,
+                        color: testResult.startsWith('✅') ? Colors.green.shade700 : AppColors.dangerInk,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -216,7 +217,7 @@ class _VehiculoDebugScreenState extends State<VehiculoDebugScreen> {
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 12,
-                color: value.startsWith('✅') ? Colors.green : (value.startsWith('❌') ? Colors.red : Colors.grey.shade700),
+                color: value.startsWith('✅') ? Colors.green : (value.startsWith('❌') ? AppColors.danger : Colors.grey.shade700),
               ),
               overflow: TextOverflow.ellipsis,
             ),

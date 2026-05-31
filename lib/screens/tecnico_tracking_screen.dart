@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../services/incidente_service.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 
 class TecnicoTrackingScreen extends StatefulWidget {
   final int idIncidente;
@@ -188,7 +189,7 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
                                     height: 44,
                                     child: const Icon(
                                       Icons.location_on,
-                                      color: Colors.red,
+                                      color: AppColors.danger,
                                       size: 40,
                                     ),
                                   ),
@@ -220,7 +221,7 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
                           const SizedBox(height: 6),
                           Row(
                             children: const [
-                              Icon(Icons.location_on, color: Colors.red),
+                              Icon(Icons.location_on, color: AppColors.danger),
                               SizedBox(width: 6),
                               Text('Cliente (incidente)'),
                             ],

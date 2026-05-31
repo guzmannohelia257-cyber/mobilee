@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../models/cotizacion.dart';
 import '../services/cotizacion_service.dart';
 
@@ -124,7 +125,7 @@ class _CotizacionesScreenState extends State<CotizacionesScreen> {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Text(_error!, style: const TextStyle(color: Colors.red)),
+          child: Text(_error!, style: TextStyle(color: AppColors.danger)),
         ),
       );
     }

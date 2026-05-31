@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
+
 import '../models/taller_publico.dart';
 import '../services/notification_service.dart';
 import '../services/tecnico_auth_service.dart';
@@ -168,7 +170,7 @@ class _TecnicoLoginScreenState extends State<TecnicoLoginScreen> {
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
                   _error!,
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.danger),
                 ),
               ),
             SizedBox(

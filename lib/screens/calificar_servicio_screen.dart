@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../models/incidente.dart';
 import '../services/incidente_service.dart';
 
@@ -166,7 +167,7 @@ class _CalificarServicioScreenState extends State<CalificarServicioScreen> {
                               ? null
                               : _enviarCalificacion,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
+                            backgroundColor: AppColors.danger,
                             foregroundColor: Colors.white,
                           ),
                           child: _enviando

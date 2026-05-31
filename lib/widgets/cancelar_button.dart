@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../models/cancelacion_response.dart';
 import '../services/cancelacion_service.dart';
 
@@ -66,7 +67,7 @@ class _CancelarButtonState extends State<CancelarButton> {
               child: const Text('Volver'),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
               onPressed: motivoCtrl.text.trim().length < 3
                   ? null
                   : () => Navigator.pop(ctx, true),
@@ -92,7 +93,7 @@ class _CancelarButtonState extends State<CancelarButton> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        SnackBar(content: Text(e.toString()), backgroundColor: AppColors.danger),
       );
     } finally {
       if (mounted) setState(() => _enviando = false);
@@ -151,7 +152,7 @@ class _CancelarButtonState extends State<CancelarButton> {
       width: double.infinity,
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),

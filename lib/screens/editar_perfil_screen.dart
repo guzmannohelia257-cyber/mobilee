@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/usuario_service.dart';
 
 class EditarPerfilScreen extends StatefulWidget {
@@ -106,18 +107,18 @@ class _EditarPerfilScreenState extends State<EditarPerfilScreen> {
                   width: double.infinity,
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    border: Border.all(color: Colors.red),
+                    color: AppColors.dangerSoft,
+                    border: Border.all(color: AppColors.danger),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red),
+                      Icon(Icons.error_outline, color: AppColors.danger),
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           errorGeneral!,
-                          style: TextStyle(color: Colors.red.shade700),
+                          style: TextStyle(color: AppColors.dangerInk),
                         ),
                       ),
                     ],

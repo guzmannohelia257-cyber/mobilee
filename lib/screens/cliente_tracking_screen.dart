@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
+
 import '../services/adenda_service.dart';
 import '../services/realtime_service.dart';
 import '../widgets/adenda_pendiente_card.dart';
@@ -213,9 +215,9 @@ class _ClienteTrackingScreenState extends State<ClienteTrackingScreen> {
               point: widget.ubicacionIncidente,
               width: 50,
               height: 50,
-              child: const Icon(
+              child: Icon(
                 Icons.location_on,
-                color: Colors.red,
+                color: AppColors.danger,
                 size: 50,
               ),
             ),

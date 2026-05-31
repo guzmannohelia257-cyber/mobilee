@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/realtime_service.dart';
 
 class EsperandoTallerScreen extends StatefulWidget {
@@ -81,7 +82,7 @@ class _EsperandoTallerScreenState extends State<EsperandoTallerScreen>
             child: const Text('Seguir esperando'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () {
               Navigator.pop(context);
               Navigator.popUntil(context, ModalRoute.withName('/conductor-home'));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/incidente_service.dart';
 import '../models/incidente.dart';
 import '../models/candidato_asignacion.dart';
@@ -57,7 +58,7 @@ class _HistorialEmergenciasScreenState
       case 3:
         return Colors.green;
       case 4:
-        return Colors.red;
+        return AppColors.danger;
       default:
         return Colors.grey;
     }
@@ -78,7 +79,7 @@ class _HistorialEmergenciasScreenState
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
+                          size: 64, color: AppColors.danger),
                       const SizedBox(height: 16),
                       Text(error!),
                       const SizedBox(height: 16),
@@ -113,7 +114,7 @@ class _HistorialEmergenciasScreenState
                             icon: const Icon(Icons.emergency),
                             label: const Text('Reportar Emergencia'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
+                              backgroundColor: AppColors.danger,
                               foregroundColor: Colors.white,
                             ),
                           ),
@@ -186,7 +187,7 @@ class _HistorialEmergenciasScreenState
         },
         label: const Text('Nueva Emergencia'),
         icon: const Icon(Icons.emergency),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.danger,
         foregroundColor: Colors.white,
       ),
     );
@@ -239,7 +240,7 @@ class _HistorialEmergenciasScreenState
               ScaffoldMessenger.of(ctx).showSnackBar(
                 SnackBar(
                   content: Text(resultado['error'] ?? 'Error IA'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.danger,
                 ),
               );
               if (resultado['code'] == 'AUTH_EXPIRED') {
@@ -263,7 +264,7 @@ class _HistorialEmergenciasScreenState
                   ),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(ctx, true),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
                     child: const Text('Sí, cancelar', style: TextStyle(color: Colors.white)),
                   ),
                 ],
@@ -287,7 +288,7 @@ class _HistorialEmergenciasScreenState
               ScaffoldMessenger.of(ctx).showSnackBar(
                 SnackBar(
                   content: Text(resultado['error'] ?? 'Error al cancelar'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.danger,
                 ),
               );
               if (resultado['code'] == 'AUTH_EXPIRED') {
@@ -443,7 +444,7 @@ class _HistorialEmergenciasScreenState
               if (inc.idEstado == 1 || inc.idEstado == 2)
                 TextButton(
                   onPressed: cancelar,
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.danger),
                   child: const Text('Cancelar solicitud'),
                 ),
               if (inc.idEstado == 3 && !inc.evaluado)
@@ -539,7 +540,7 @@ class _HistorialEmergenciasScreenState
       case 'en_camino':
         return Colors.green;
       case 'rechazada':
-        return Colors.red;
+        return AppColors.danger;
       case 'completada':
         return Colors.blue;
       case 'pendiente':
@@ -596,7 +597,7 @@ class _HistorialEmergenciasScreenState
   Color _colorConfianza(double c) {
     if (c >= 0.8) return Colors.green;
     if (c >= 0.6) return Colors.orange;
-    return Colors.red;
+    return AppColors.danger;
   }
 
   Widget _detailRow(String label, String value) {

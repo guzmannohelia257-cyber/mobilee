@@ -11,6 +11,7 @@ import '../models/incidente.dart';
 import '../models/categoria.dart';
 import 'seleccionar_taller_screen.dart';
 import '../services/taller_service.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 
 /// Evidencia capturada localmente, aún no subida al backend.
 class _PendingEvidencia {
@@ -185,7 +186,7 @@ class _SubirEvidenciaScreenState extends State<SubirEvidenciaScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('❌ $msg'),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 90),
       ),
@@ -214,7 +215,7 @@ class _SubirEvidenciaScreenState extends State<SubirEvidenciaScreen> {
             icon: const Icon(Icons.emergency),
             label: const Text('Reportar'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.danger,
               foregroundColor: Colors.white,
             ),
           ),
@@ -406,7 +407,7 @@ class _SubirEvidenciaScreenState extends State<SubirEvidenciaScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(titulo),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.danger,
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -436,7 +437,7 @@ class _SubirEvidenciaScreenState extends State<SubirEvidenciaScreen> {
                   onPressed:
                       subiendo || reportando ? null : _toggleGrabacion,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: grabando ? Colors.red : null,
+                    backgroundColor: grabando ? AppColors.danger : null,
                     foregroundColor: grabando ? Colors.white : null,
                   ),
                   icon: Icon(grabando ? Icons.stop : Icons.mic),
@@ -494,7 +495,7 @@ class _SubirEvidenciaScreenState extends State<SubirEvidenciaScreen> {
                           ? _reportarIncidente
                           : _volverAlMenu),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppColors.danger,
                     foregroundColor: Colors.white,
                   ),
                   icon: reportando
@@ -544,14 +545,14 @@ class _SubirEvidenciaScreenState extends State<SubirEvidenciaScreen> {
                           const Icon(Icons.broken_image),
                     ),
                   )
-                : const Icon(Icons.audiotrack, size: 40, color: Colors.red),
+                : const Icon(Icons.audiotrack, size: 40, color: AppColors.danger),
             title: Text(p.esImagen ? 'Imagen' : 'Audio'),
             subtitle: const Text(
               'Pendiente de enviar',
               style: TextStyle(fontSize: 12, color: Colors.orange),
             ),
             trailing: IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              icon: const Icon(Icons.delete_outline, color: AppColors.danger),
               tooltip: 'Quitar',
               onPressed: reportando
                   ? null
@@ -586,7 +587,7 @@ class _SubirEvidenciaScreenState extends State<SubirEvidenciaScreen> {
                 : Icon(
                     e.esAudio ? Icons.audiotrack : Icons.description,
                     size: 40,
-                    color: Colors.red,
+                    color: AppColors.danger,
                   ),
             title: Text(e.getTipoNombre()),
             subtitle: Text(

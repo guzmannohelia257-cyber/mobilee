@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../models/taller_publico.dart';
 import '../services/tecnico_auth_service.dart';
 import 'tecnico_login_screen.dart';
@@ -51,7 +52,7 @@ class _State extends State<SeleccionarTallerLoginScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 48),
+            const Icon(Icons.error_outline, color: AppColors.danger, size: 48),
             const SizedBox(height: 8),
             Text(_error!),
             const SizedBox(height: 8),

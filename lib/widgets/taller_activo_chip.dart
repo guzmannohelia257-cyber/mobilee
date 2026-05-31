@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../models/taller_activo.dart';
 import '../services/tecnico_auth_service.dart';
 
@@ -95,9 +96,9 @@ class _TallerActivoChipState extends State<TallerActivoChip> {
         PopupMenuItem(
           value: 'logout',
           child: Row(children: [
-            Icon(Icons.logout, size: 18, color: Colors.red),
+            Icon(Icons.logout, size: 18, color: AppColors.danger),
             SizedBox(width: 8),
-            Text('Cerrar sesion', style: TextStyle(color: Colors.red)),
+            Text('Cerrar sesion', style: TextStyle(color: AppColors.danger)),
           ]),
         ),
       ],

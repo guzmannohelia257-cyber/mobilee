@@ -284,8 +284,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFB11D27),
-                Color(0xFF8B1620),
+                Color(0xFFC26849),
+                Color(0xFF984B30),
               ],
             ),
             boxShadow: [
@@ -572,7 +572,7 @@ class _AvatarChip extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFB11D27), Color(0xFF7C1419)],
+          colors: [Color(0xFFC26849), Color(0xFF984B30)],
         ),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [

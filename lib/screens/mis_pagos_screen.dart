@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 import 'package:intl/intl.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
+
 import '../models/pago_cliente_item.dart';
 import '../services/pagos_service.dart';
 import '../utils/app_logger.dart';
@@ -191,7 +193,7 @@ class _MisPagosScreenState extends State<MisPagosScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(mensaje),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.danger,
       ),
     );
   }
@@ -203,7 +205,7 @@ class _MisPagosScreenState extends State<MisPagosScreen>
       case 'procesando':
         return Colors.blue;
       case 'fallido':
-        return Colors.red;
+        return AppColors.danger;
       case 'reembolsado':
         return Colors.purple;
       default:
@@ -343,7 +345,7 @@ class _MisPagosScreenState extends State<MisPagosScreen>
                         icon: const Icon(Icons.credit_card),
                         label: Text('Pagar ${_monto(item.montoTotal)}'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade700,
+                          backgroundColor: AppColors.dangerInk,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -384,7 +386,7 @@ class _MisPagosScreenState extends State<MisPagosScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                        const Icon(Icons.error_outline, color: AppColors.danger, size: 64),
                         const SizedBox(height: 12),
                         Text(_error!, textAlign: TextAlign.center),
                         const SizedBox(height: 18),

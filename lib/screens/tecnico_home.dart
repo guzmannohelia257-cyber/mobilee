@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/auth_service.dart';
 import '../widgets/taller_activo_chip.dart';
 
@@ -376,7 +377,7 @@ class _TecnicoHomeScreenState extends State<TecnicoHomeScreen> {
                         height: 24,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.red.shade600,
+                          color: AppColors.danger,
                         ),
                         child: Center(
                           child: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../models/categoria.dart';
 import '../models/taller.dart';
 import '../services/incidente_service.dart';
@@ -110,7 +111,7 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Falta el incidente: vuelve y reporta primero.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
       return;
@@ -129,7 +130,7 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(res['error']?.toString() ?? 'No se pudo confirmar'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
       if (res['code'] == 'AUTH_EXPIRED') {
@@ -228,7 +229,7 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 48),
+            const Icon(Icons.error_outline, color: AppColors.danger, size: 48),
             const SizedBox(height: 8),
             Text(_error!),
             const SizedBox(height: 8),

@@ -9,6 +9,7 @@ import '../services/location_sender.dart';
 import '../services/tecnico_asignaciones_service.dart';
 import '../widgets/completar_servicio_dialog.dart';
 import '../widgets/cancelar_button.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 
 class AsignacionDetalleScreen extends StatefulWidget {
   final int idAsignacion;
@@ -96,7 +97,7 @@ class _AsignacionDetalleScreenState extends State<AsignacionDetalleScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error al completar servicio: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
     }
@@ -129,7 +130,7 @@ class _AsignacionDetalleScreenState extends State<AsignacionDetalleScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Permiso de GPS denegado. Activalo en ajustes.'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.danger,
           ),
         );
       }
@@ -138,7 +139,7 @@ class _AsignacionDetalleScreenState extends State<AsignacionDetalleScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
     } finally {
@@ -229,7 +230,7 @@ class _AsignacionDetalleScreenState extends State<AsignacionDetalleScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${r['error']}'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
     }

@@ -90,7 +90,7 @@ class MyApp extends StatelessWidget {
     ));
     return MaterialApp(
       navigatorKey: NotificationService.navigatorKey,
-      title: 'Flujo Emergencia — Asistencia Vehicular',
+      title: 'AutoRescate — Asistencia Vehicular',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.build(),
       builder: (context, child) {

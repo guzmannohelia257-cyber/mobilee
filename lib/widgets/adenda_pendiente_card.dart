@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/adenda_service.dart';
 
 /// Tarjeta que muestra una adenda pendiente del taller para que el cliente
@@ -52,7 +53,7 @@ class _AdendaPendienteCardState extends State<AdendaPendienteCard> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${r['error']}'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
     }

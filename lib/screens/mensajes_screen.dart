@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../services/mensajes_service.dart';
 import '../services/auth_service.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 
 class MensajesScreen extends StatefulWidget {
   final int idIncidente;
@@ -101,7 +102,7 @@ class _MensajesScreenState extends State<MensajesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Mensajes — Incidente #${widget.idIncidente}'),
-        backgroundColor: Colors.red.shade700,
+        backgroundColor: AppColors.dangerInk,
         foregroundColor: Colors.white,
       ),
       body: Column(
@@ -137,7 +138,7 @@ class _MensajesScreenState extends State<MensajesScreen> {
           maxWidth: MediaQuery.of(context).size.width * 0.72,
         ),
         decoration: BoxDecoration(
-          color: esMio ? Colors.red.shade700 : Colors.grey.shade200,
+          color: esMio ? AppColors.dangerInk : Colors.grey.shade200,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -212,7 +213,7 @@ class _MensajesScreenState extends State<MensajesScreen> {
           FloatingActionButton(
             mini: true,
             onPressed: _enviando ? null : _enviar,
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: AppColors.dangerInk,
             child: _enviando
                 ? const SizedBox(
                     width: 20,

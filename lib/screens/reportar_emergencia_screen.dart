@@ -236,7 +236,7 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFB11D27), Color(0xFF8B1620)],
+          colors: [Color(0xFFC26849), Color(0xFF984B30)],
         ),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         boxShadow: [

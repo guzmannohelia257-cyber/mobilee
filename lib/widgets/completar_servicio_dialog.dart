@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
+
 import '../models/completar_servicio_form.dart';
 
 class CompletarServicioDialog extends StatefulWidget {
@@ -40,7 +42,7 @@ class _CompletarServicioDialogState extends State<CompletarServicioDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Ingresa costo o resumen del trabajo'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
       return;
@@ -50,7 +52,7 @@ class _CompletarServicioDialogState extends State<CompletarServicioDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('El costo no puede ser negativo'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
       return;
@@ -60,7 +62,7 @@ class _CompletarServicioDialogState extends State<CompletarServicioDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('El resumen no puede exceder 1000 caracteres'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.danger,
         ),
       );
       return;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/vehiculo_service.dart';
 import 'registrar_vehiculo_screen.dart';
 import 'editar_vehiculo_screen.dart';
@@ -99,7 +100,7 @@ class _MisVehiculosScreenState extends State<MisVehiculosScreen> {
         cargarVehiculos();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ ${resultado['error']}'), backgroundColor: Colors.red),
+          SnackBar(content: Text('❌ ${resultado['error']}'), backgroundColor: AppColors.danger),
         );
       }
     }
@@ -125,7 +126,7 @@ class _MisVehiculosScreenState extends State<MisVehiculosScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, size: 64, color: Colors.red),
+                      Icon(Icons.error_outline, size: 64, color: AppColors.danger),
                       SizedBox(height: 16),
                       Text(error!),
                       SizedBox(height: 16),
@@ -167,7 +168,7 @@ class _MisVehiculosScreenState extends State<MisVehiculosScreen> {
                                   onTap: () => irEditar(vehiculo),
                                 ),
                                 PopupMenuItem(
-                                  child: Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                  child: Text('Eliminar', style: TextStyle(color: AppColors.danger)),
                                   onTap: () => eliminarVehiculo(vehiculo['id_vehiculo'], vehiculo['placa']),
                                 ),
                               ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/vehiculo_service.dart';
 
 class EditarVehiculoScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _EditarVehiculoScreenState extends State<EditarVehiculoScreen> {
       } else {
         setState(() => error = resultado['error']);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ ${resultado['error']}'), backgroundColor: Colors.red),
+          SnackBar(content: Text('❌ ${resultado['error']}'), backgroundColor: AppColors.danger),
         );
       }
     }
@@ -90,10 +91,10 @@ class _EditarVehiculoScreenState extends State<EditarVehiculoScreen> {
                 padding: EdgeInsets.all(12),
                 margin: EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade100,
+                  color: AppColors.dangerSoft,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(error!, style: TextStyle(color: Colors.red.shade700)),
+                child: Text(error!, style: TextStyle(color: AppColors.dangerInk)),
               ),
             
             Text('Placa', style: TextStyle(fontWeight: FontWeight.bold)),

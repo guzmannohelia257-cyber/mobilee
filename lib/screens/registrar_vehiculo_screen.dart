@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../services/vehiculo_service.dart';
 
 class RegistrarVehiculoScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class _RegistrarVehiculoScreenState extends State<RegistrarVehiculoScreen> {
     // Validar placa obligatoria
     if (placaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('La placa es obligatoria'), backgroundColor: Colors.red),
+        SnackBar(content: Text('La placa es obligatoria'), backgroundColor: AppColors.danger),
       );
       return;
     }
@@ -81,7 +82,7 @@ class _RegistrarVehiculoScreenState extends State<RegistrarVehiculoScreen> {
       } else {
         setState(() => error = resultado['error']);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ ${resultado['error']}'), backgroundColor: Colors.red),
+          SnackBar(content: Text('❌ ${resultado['error']}'), backgroundColor: AppColors.danger),
         );
       }
     }
@@ -104,10 +105,10 @@ class _RegistrarVehiculoScreenState extends State<RegistrarVehiculoScreen> {
                 padding: EdgeInsets.all(12),
                 margin: EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade100,
+                  color: AppColors.dangerSoft,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(error!, style: TextStyle(color: Colors.red.shade700)),
+                child: Text(error!, style: TextStyle(color: AppColors.dangerInk)),
               ),
             
             // Placa (obligatoria)

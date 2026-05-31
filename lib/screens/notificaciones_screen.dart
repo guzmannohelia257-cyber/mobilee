@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:app_emergencias/theme/app_colors.dart';
 import '../models/incidente.dart';
 import '../services/incidente_service.dart';
 import '../services/notification_service.dart';
@@ -159,7 +160,7 @@ class _NotificacionesScreenState extends State<NotificacionesScreen> {
                                 leido
                                     ? Icons.notifications_none
                                     : Icons.notifications_active,
-                                color: leido ? Colors.grey : Colors.red,
+                                color: leido ? Colors.grey : AppColors.danger,
                               ),
                               title: Text(
                                 titulo,

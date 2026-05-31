@@ -106,6 +106,10 @@ class OutboxService {
     };
 
     try {
+      // Timeout para que una red caida (sin cerrar el socket) no deje el envio
+      // colgado bloqueando todo el drenado. Al expirar lanza TimeoutException,
+      // que el catch de abajo convierte en reintentable.
+      const timeout = Duration(seconds: 30);
       http.Response resp;
       if (filesPaths.isNotEmpty) {
         final req = http.MultipartRequest(method, uri)..headers.addAll(headers);
@@ -116,33 +120,33 @@ class OutboxService {
             req.files.add(await http.MultipartFile.fromPath('archivo', p));
           }
         }
-        resp = await http.Response.fromStream(await req.send());
+        resp = await http.Response.fromStream(await req.send().timeout(timeout));
       } else {
         headers['Content-Type'] = 'application/json';
         switch (method) {
           case 'POST':
-            resp = await http.post(
-              uri,
-              headers: headers,
-              body: body == null ? null : jsonEncode(body),
-            );
+            resp = await http
+                .post(uri,
+                    headers: headers,
+                    body: body == null ? null : jsonEncode(body))
+                .timeout(timeout);
             break;
           case 'PUT':
-            resp = await http.put(
-              uri,
-              headers: headers,
-              body: body == null ? null : jsonEncode(body),
-            );
+            resp = await http
+                .put(uri,
+                    headers: headers,
+                    body: body == null ? null : jsonEncode(body))
+                .timeout(timeout);
             break;
           case 'PATCH':
-            resp = await http.patch(
-              uri,
-              headers: headers,
-              body: body == null ? null : jsonEncode(body),
-            );
+            resp = await http
+                .patch(uri,
+                    headers: headers,
+                    body: body == null ? null : jsonEncode(body))
+                .timeout(timeout);
             break;
           case 'DELETE':
-            resp = await http.delete(uri, headers: headers);
+            resp = await http.delete(uri, headers: headers).timeout(timeout);
             break;
           default:
             return true;

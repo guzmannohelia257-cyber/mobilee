@@ -1,8 +1,11 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:async';
+
+import 'package:flutter/material.dart';
 
 import '../models/asignacion_response.dart';
 import '../models/evidencia.dart';
 import '../services/auth_service.dart';
+import '../services/realtime_service.dart';
 import '../services/tecnico_asignaciones_service.dart';
 import '../services/tecnico_auth_service.dart';
 import '../widgets/taller_activo_chip.dart';
@@ -19,6 +22,8 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
       TecnicoAsignacionesService();
   final AuthService _authService = AuthService();
   final TecnicoAuthService _tecnicoAuthService = TecnicoAuthService();
+  final RealtimeService _realtime = RealtimeService();
+  StreamSubscription<WsEvent>? _rtSub;
 
   AsignacionResponse? _asignacion;
   IncidenteResponse? _incidente;
@@ -36,10 +41,23 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
     super.initState();
     _log('initState -> dashboard tecnico inicializado');
     _loadAsignacion();
+    // Tiempo real: el técnico ya está suscrito a su canal usuario:{id} en el
+    // login. Cuando el taller lo asigna, el backend publica 'asignacion.asignada'
+    // y recargamos la asignación sin que el técnico tenga que refrescar.
+    _rtSub = _realtime.events.listen(_onRealtimeEvent);
+  }
+
+  void _onRealtimeEvent(WsEvent evt) {
+    if (!mounted) return;
+    if (evt.event == 'asignacion.asignada') {
+      _log('realtime -> asignacion.asignada, recargando asignacion');
+      _loadAsignacion();
+    }
   }
 
   @override
   void dispose() {
+    _rtSub?.cancel();
     _tecnicoService.detenerSeguimientoUbicacion();
     super.dispose();
   }

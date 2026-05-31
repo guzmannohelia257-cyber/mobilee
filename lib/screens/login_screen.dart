@@ -333,7 +333,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _autoLoginConductor() async {
     AppLogger.separator(title: 'AUTO-LOGIN CONDUCTOR');
     await _handleLoginWithCredentials(
-      'lucia.gutierrez@gmail.com',
+      'lucia.pendiente.demo@gmail.com',
       'cliente2026#',
     );
   }
@@ -456,7 +456,7 @@ class _LoginScreenState extends State<LoginScreen> {
               _DevTile(
                 icon: Icons.bolt_outlined,
                 title: 'Entrar como conductor demo',
-                subtitle: 'lucia.gutierrez@gmail.com',
+                subtitle: 'lucia.pendiente.demo@gmail.com',
                 onTap: () {
                   Navigator.pop(sheetCtx);
                   _autoLoginConductor();
@@ -475,11 +475,11 @@ class _LoginScreenState extends State<LoginScreen> {
               _DevTile(
                 icon: Icons.edit_outlined,
                 title: 'Autorellenar conductor',
-                subtitle: 'lucia.gutierrez@gmail.com',
+                subtitle: 'lucia.pendiente.demo@gmail.com',
                 onTap: () {
                   Navigator.pop(sheetCtx);
                   setState(() {
-                    _emailController.text = 'lucia.gutierrez@gmail.com';
+                    _emailController.text = 'lucia.pendiente.demo@gmail.com';
                     _passwordController.text = 'cliente2026#';
                   });
                 },

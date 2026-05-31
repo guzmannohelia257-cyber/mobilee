@@ -62,8 +62,8 @@ class _State extends State<SeleccionarTallerLoginScreen> {
       );
     }
 
-    // Demo taller (Taller Excelente, id=1 — juanperez.tecnico@gmail.com / tecnico123!)
-    final tallerDemo = TallerPublico(idTaller: 1, nombre: 'Taller Excelente');
+    // Demo taller (AutoRescate Santa Cruz, id=1 — rodrigo.anez@gmail.com / tecnico2026#)
+    final tallerDemo = TallerPublico(idTaller: 1, nombre: 'AutoRescate Santa Cruz');
 
     return Column(
       children: [
@@ -95,7 +95,7 @@ class _State extends State<SeleccionarTallerLoginScreen> {
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
-                    'Demo: Taller Excelente  ·  juanperez.tecnico@gmail.com',
+                    'Demo: AutoRescate Santa Cruz  ·  rodrigo.anez@gmail.com',
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ),

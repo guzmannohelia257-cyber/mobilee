@@ -108,8 +108,8 @@ class _TecnicoLoginScreenState extends State<TecnicoLoginScreen> {
                   onTap: _loading
                       ? null
                       : () => setState(() {
-                            _emailController.text = 'juanperez.tecnico@gmail.com';
-                            _passwordController.text = 'tecnico123!';
+                            _emailController.text = 'rodrigo.anez@gmail.com';
+                            _passwordController.text = 'tecnico2026#';
                           }),
                   child: Container(
                     padding: const EdgeInsets.symmetric(

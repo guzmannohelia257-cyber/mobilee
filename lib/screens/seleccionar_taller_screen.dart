@@ -275,16 +275,16 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
                 ),
               if (t.totalEstimado != null) ...[
                 Text(
-                  'Total estimado: \$${t.totalEstimado!.toStringAsFixed(2)}',
+                  'Total estimado: Bs ${t.totalEstimado!.toStringAsFixed(2)}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 if (t.tarifaBase != null && t.montoTraslado != null && t.montoTraslado! > 0)
                   Text(
-                    'Servicio \$${t.tarifaBase!.toStringAsFixed(0)} + traslado \$${t.montoTraslado!.toStringAsFixed(2)}',
+                    'Servicio Bs ${t.tarifaBase!.toStringAsFixed(0)} + traslado Bs ${t.montoTraslado!.toStringAsFixed(2)}',
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
               ] else if (t.tarifaBase != null) ...[
-                Text('Desde \$${t.tarifaBase!.toStringAsFixed(0)}'),
+                Text('Desde Bs ${t.tarifaBase!.toStringAsFixed(0)}'),
               ],
               if (t.ratingPromedio != null)
                 Row(children: [

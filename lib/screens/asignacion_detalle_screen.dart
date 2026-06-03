@@ -170,7 +170,7 @@ class _AsignacionDetalleScreenState extends State<AsignacionDetalleScreen> {
               controller: montoCtl,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
-                labelText: 'Monto adicional (USD)',
+                labelText: 'Monto adicional (Bs)',
                 hintText: 'Ej: 50',
               ),
             ),

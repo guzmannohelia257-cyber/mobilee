@@ -96,7 +96,7 @@ class _CompletarServicioDialogState extends State<CompletarServicioDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Cobro final (USD)'),
+            const Text('Cobro final (Bs)'),
             const SizedBox(height: 4),
             Text(
               'Ajustalo si hubo gastos adicionales (la tarifa de la cotizacion es solo referencial).',

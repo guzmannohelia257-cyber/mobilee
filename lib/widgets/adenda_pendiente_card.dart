@@ -110,7 +110,7 @@ class _AdendaPendienteCardState extends State<AdendaPendienteCard> {
             const SizedBox(height: 8),
             Text(
               'El taller solicita un costo adicional de '
-              '\$${ad.montoAdicional.toStringAsFixed(2)}',
+              'Bs ${ad.montoAdicional.toStringAsFixed(2)}',
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),

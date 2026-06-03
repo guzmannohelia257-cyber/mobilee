@@ -227,7 +227,7 @@ class _CotizacionesScreenState extends State<CotizacionesScreen> {
 
   String _money(double? value) {
     if (value == null) return '—';
-    return '\$${value.toStringAsFixed(2)}';
+    return 'Bs ${value.toStringAsFixed(2)}';
   }
 
   Widget _row(String label, String value, {bool bold = false}) {

@@ -122,7 +122,7 @@ class _CancelarButtonState extends State<CancelarButton> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Compensacion al taller: \$${r.compensacionMonto.toStringAsFixed(2)}',
+                    'Compensacion al taller: Bs ${r.compensacionMonto.toStringAsFixed(2)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 4),

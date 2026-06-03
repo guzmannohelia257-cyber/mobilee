@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:app_emergencias/theme/app_colors.dart';
 
@@ -100,13 +101,22 @@ class _MisPagosScreenState extends State<MisPagosScreen>
       final paymentIntentId = intentResult['payment_intent_id'] as String;
       AppLogger.info('PaymentIntent creado: $paymentIntentId', tag: _tag);
 
-      // 2. Inicializar PaymentSheet de Stripe
+      // 2. Inicializar PaymentSheet de Stripe. Pre-llenamos nombre y correo del
+      // usuario para que solo tenga que ingresar la tarjeta (Stripe no permite
+      // precargar el numero de tarjeta por seguridad).
+      final prefs = await SharedPreferences.getInstance();
+      final nombreUsuario = prefs.getString('user_name');
+      final emailUsuario = prefs.getString('user_email');
       AppLogger.debug('Inicializando PaymentSheet', tag: _tag);
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           merchantDisplayName: 'Flujo Emergencia',
           style: ThemeMode.system,
+          billingDetails: BillingDetails(
+            name: (nombreUsuario != null && nombreUsuario.isNotEmpty) ? nombreUsuario : null,
+            email: (emailUsuario != null && emailUsuario.isNotEmpty) ? emailUsuario : null,
+          ),
           appearance: const PaymentSheetAppearance(
             colors: PaymentSheetAppearanceColors(
               primary: Color(0xFFD32F2F),
@@ -229,8 +239,8 @@ class _MisPagosScreenState extends State<MisPagosScreen>
   }
 
   String _monto(double monto) => NumberFormat.currency(
-        locale: 'es_MX',
-        symbol: '\$',
+        locale: 'es_BO',
+        symbol: 'Bs ',
         decimalDigits: 2,
       ).format(monto);
 

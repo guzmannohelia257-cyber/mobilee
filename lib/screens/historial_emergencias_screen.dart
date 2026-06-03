@@ -539,6 +539,8 @@ class _HistorialEmergenciasScreenState
       case 'aceptada':
       case 'en_camino':
         return Colors.green;
+      case 'llegado':
+        return Colors.indigo;
       case 'rechazada':
         return AppColors.danger;
       case 'completada':

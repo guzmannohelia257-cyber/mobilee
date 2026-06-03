@@ -86,6 +86,8 @@ class Asignacion {
       case 'en_camino':
         final eta = etaMinutos != null ? ' (ETA: $etaMinutos min)' : '';
         return '🚗 ${taller.nombre} en camino$eta';
+      case 'llegado':
+        return '📍 ${taller.nombre} en sitio';
       case 'completada':
         return '🏁 Atención completada por ${taller.nombre}';
       default:

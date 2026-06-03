@@ -390,15 +390,15 @@ class TecnicoAsignacionesService {
     }
   }
 
-  /// Inicia el envío periódico de ubicación (cada 30 segundos).
+  /// Inicia el envío periódico de ubicación (cada 8 segundos).
   void iniciarSeguimientoUbicacion() {
     _locationTimer?.cancel();
     actualizarUbicacion(); // Envío inmediato al iniciar el seguimiento.
     _locationTimer = Timer.periodic(
-      const Duration(seconds: 30),
+      const Duration(seconds: 8),
       (_) => actualizarUbicacion(),
     );
-    debugPrint('[TecnicoAsignacionesService] seguimiento GPS iniciado (cada 30s)');
+    debugPrint('[TecnicoAsignacionesService] seguimiento GPS iniciado (cada 8s)');
   }
 
   /// Detiene el envío periódico de ubicación.

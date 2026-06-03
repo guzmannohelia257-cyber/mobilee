@@ -364,7 +364,7 @@ class _AsignacionDetalleScreenState extends State<AsignacionDetalleScreen> {
                     const Icon(Icons.gps_fixed, color: Colors.green),
                     const SizedBox(width: 8),
                     const Expanded(
-                      child: Text('Enviando ubicacion cada 12s'),
+                      child: Text('Enviando ubicacion cada 8s'),
                     ),
                     if (_etaMinutos != null)
                       Text('ETA: $_etaMinutos min'),

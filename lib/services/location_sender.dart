@@ -46,7 +46,7 @@ class LocationSender {
 
   Future<bool> start({
     required int idAsignacion,
-    Duration interval = const Duration(seconds: 12),
+    Duration interval = const Duration(seconds: 8),
   }) async {
     _statusCtrl.add(LocationSenderStatus.pidiendoPermisos);
 

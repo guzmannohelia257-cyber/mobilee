@@ -40,7 +40,7 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
   void initState() {
     super.initState();
     _cargarUbicacion();
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
       _cargarUbicacion(silent: true);
     });
   }

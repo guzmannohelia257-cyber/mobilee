@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../services/incidente_service.dart';
+import '../widgets/cancelar_button.dart';
 import 'package:app_emergencias/theme/app_colors.dart';
 
 class TecnicoTrackingScreen extends StatefulWidget {
@@ -35,6 +36,7 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
   double? _tecnicoLng;
   String _nombreTecnico = 'Técnico';
   String _estadoAsignacion = 'desconocido';
+  int? _idAsignacion;
 
   @override
   void initState() {
@@ -70,6 +72,7 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
         _tecnicoLng = (data['longitud_tecnico'] as num?)?.toDouble();
         _nombreTecnico = (data['nombre_tecnico'] ?? 'Técnico').toString();
         _estadoAsignacion = (data['estado_asignacion'] ?? 'desconocido').toString();
+        _idAsignacion = (data['id_asignacion'] as num?)?.toInt();
         _error = null;
         _cargando = false;
       });
@@ -106,9 +109,23 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
         ? _estimarMinutosDesdeKm(distanciaKm)
         : null;
 
+    // El cliente puede cancelar mientras el servicio no haya terminado; la
+    // compensacion al taller se cobra segun el estado (en_camino/llegado = 100%).
+    final puedeCancelar = _idAsignacion != null &&
+        _estadoAsignacion != 'completada' &&
+        _estadoAsignacion != 'cancelada' &&
+        _estadoAsignacion != 'desconocido';
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Seguimiento #${widget.idIncidente}'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Actualizar',
+            onPressed: _cargarUbicacion,
+          ),
+        ],
       ),
       body: _cargando
           ? const Center(child: CircularProgressIndicator())
@@ -239,11 +256,17 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
                     ),
                   ],
                 ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _cargarUbicacion,
-        icon: const Icon(Icons.refresh),
-        label: const Text('Actualizar'),
-      ),
+      bottomNavigationBar: puedeCancelar
+          ? SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: CancelarButton(
+                  idAsignacion: _idAsignacion!,
+                  onCancelado: () => Navigator.of(context).pop(),
+                ),
+              ),
+            )
+          : null,
     );
   }
 

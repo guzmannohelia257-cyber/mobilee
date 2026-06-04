@@ -687,4 +687,40 @@ class IncidenteService {
       return {'success': false, 'error': 'Error: $e'};
     }
   }
+
+  /// Cambiar el taller eligiendo otro de la lista (por id de taller), cuando el
+  /// incidente ya esta 'pendiente' (no 'borrador'). Reasigna la asignacion.
+  Future<Map<String, dynamic>> cambiarTallerPorTaller({
+    required int idIncidente,
+    required int idTaller,
+  }) async {
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'error': 'No autenticado'};
+      }
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/incidencias/$idIncidente/cambiar-taller'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({'id_taller': idTaller}),
+          )
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Sesión expirada', 'code': 'AUTH_EXPIRED'};
+      }
+      final body = jsonDecode(response.body);
+      return {
+        'success': false,
+        'error': body['detail']?.toString() ?? 'No se pudo cambiar de taller',
+      };
+    } catch (e) {
+      return {'success': false, 'error': 'Error: $e'};
+    }
+  }
 }

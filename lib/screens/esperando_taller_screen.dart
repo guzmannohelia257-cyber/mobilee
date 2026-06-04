@@ -3,15 +3,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:app_emergencias/theme/app_colors.dart';
+import '../models/categoria.dart';
+import '../services/incidente_service.dart';
 import '../services/realtime_service.dart';
 import 'mensajes_screen.dart';
+import 'seleccionar_taller_screen.dart';
 
 class EsperandoTallerScreen extends StatefulWidget {
   final int idIncidente;
+  // Opcionales: permiten "elegir otro taller" reabriendo la lista.
+  final Categoria? categoria;
+  final double? latitud;
+  final double? longitud;
 
   const EsperandoTallerScreen({
     super.key,
     required this.idIncidente,
+    this.categoria,
+    this.latitud,
+    this.longitud,
   });
 
   @override
@@ -21,6 +31,7 @@ class EsperandoTallerScreen extends StatefulWidget {
 class _EsperandoTallerScreenState extends State<EsperandoTallerScreen>
     with SingleTickerProviderStateMixin {
   final _rt = RealtimeService();
+  final _incidenteService = IncidenteService();
   StreamSubscription? _sub;
   late AnimationController _pulseCtrl;
   Timer? _timeoutTimer;
@@ -28,6 +39,64 @@ class _EsperandoTallerScreenState extends State<EsperandoTallerScreen>
   int _segundosEspera = 0;
   Timer? _tickTimer;
   bool _navegando = false;
+
+  /// Reabre la lista de talleres para elegir otro (reasigna el incidente).
+  Future<void> _elegirOtroTaller() async {
+    final cat = widget.categoria;
+    if (cat == null || widget.latitud == null || widget.longitud == null) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SeleccionarTallerScreen(
+          categoria: cat,
+          latitud: widget.latitud!,
+          longitud: widget.longitud!,
+          idIncidente: widget.idIncidente,
+          modoCambio: true,
+        ),
+      ),
+    );
+    // Al volver seguimos esperando (ahora al nuevo taller elegido).
+  }
+
+  /// Cancela la emergencia (el incidente ya esta 'pendiente') y vuelve al home.
+  Future<void> _cancelar() async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('¿Cancelar la emergencia?'),
+        content: const Text(
+          'Se cancelará tu solicitud y no se enviará a ningún taller.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sí, cancelar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmar != true) return;
+    final res = await _incidenteService.cancelarIncidente(widget.idIncidente);
+    if (!mounted) return;
+    if (res['success'] == true) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/conductor-home',
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res['error']?.toString() ?? 'No se pudo cancelar'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -116,7 +185,7 @@ class _EsperandoTallerScreenState extends State<EsperandoTallerScreen>
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
-        title: const Text('Buscando taller'),
+        title: const Text('Esperando al taller'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -151,14 +220,14 @@ class _EsperandoTallerScreenState extends State<EsperandoTallerScreen>
             ),
             const SizedBox(height: 32),
             const Text(
-              'Notificando talleres cercanos...',
+              'Esperando confirmación del taller',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 32),
               child: Text(
-                'Te avisaremos en cuanto un taller acepte tu solicitud.',
+                'Te avisaremos en cuanto el taller que elegiste acepte tu solicitud.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.black54),
               ),
@@ -184,6 +253,21 @@ class _EsperandoTallerScreenState extends State<EsperandoTallerScreen>
               ),
               icon: const Icon(Icons.chat_bubble_outline),
               label: const Text('Mensaje al taller'),
+            ),
+            if (widget.categoria != null) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: _elegirOtroTaller,
+                icon: const Icon(Icons.swap_horiz),
+                label: const Text('Elegir otro taller'),
+              ),
+            ],
+            const SizedBox(height: 4),
+            TextButton.icon(
+              onPressed: _cancelar,
+              style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+              icon: const Icon(Icons.close),
+              label: const Text('Cancelar emergencia'),
             ),
           ],
         ),

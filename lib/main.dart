@@ -23,6 +23,7 @@ import 'screens/notificaciones_screen.dart';
 import 'screens/calificar_servicio_screen.dart';
 import 'screens/cotizaciones_screen.dart';
 import 'screens/esperando_taller_screen.dart';
+import 'models/categoria.dart';
 import 'screens/cliente_tracking_screen.dart';
 import 'screens/seleccionar_taller_login_screen.dart';
 import 'config/stripe_config.dart';
@@ -152,7 +153,12 @@ class MyApp extends StatelessWidget {
               body: Center(child: Text('Incidente no disponible')),
             );
           }
-          return EsperandoTallerScreen(idIncidente: id);
+          return EsperandoTallerScreen(
+            idIncidente: id,
+            categoria: args?['categoria'] as Categoria?,
+            latitud: (args?['latitud'] as num?)?.toDouble(),
+            longitud: (args?['longitud'] as num?)?.toDouble(),
+          );
         },
         '/cliente-tracking': (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map?;

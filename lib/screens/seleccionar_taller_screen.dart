@@ -16,6 +16,9 @@ class SeleccionarTallerScreen extends StatefulWidget {
   /// ID del incidente ya creado (opcional). Si viene, se pasa a las pantallas
   /// siguientes (/cotizaciones o /esperando-taller) para suscribirse a WS.
   final int? idIncidente;
+  /// Si true, el incidente ya esta 'pendiente' y al tocar un taller se REASIGNA
+  /// (cambiar-taller) en vez de confirmar; se usa para "elegir otro taller".
+  final bool modoCambio;
 
   const SeleccionarTallerScreen({
     super.key,
@@ -23,6 +26,7 @@ class SeleccionarTallerScreen extends StatefulWidget {
     required this.latitud,
     required this.longitud,
     this.idIncidente,
+    this.modoCambio = false,
   });
 
   @override
@@ -130,6 +134,28 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
     if (_confirmando) return;
     setState(() => _confirmando = true);
 
+    // Modo cambio: el incidente ya esta pendiente; reasignamos a otro taller y
+    // volvemos a la pantalla de espera (ahora esperando al nuevo).
+    if (widget.modoCambio) {
+      final cambio = await _incidenteService.cambiarTallerPorTaller(
+        idIncidente: widget.idIncidente!,
+        idTaller: t.idTaller,
+      );
+      if (!mounted) return;
+      if (cambio['success'] == true) {
+        Navigator.pop(context, true);
+      } else {
+        setState(() => _confirmando = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(cambio['error']?.toString() ?? 'No se pudo cambiar de taller'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+      return;
+    }
+
     final res = await _incidenteService.confirmarIncidencia(
       idIncidente: widget.idIncidente!,
       idTallerPreferido: t.idTaller,
@@ -165,6 +191,10 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
       arguments: {
         'id_incidente': widget.idIncidente,
         'taller_preferido': t.idTaller,
+        // Para poder "elegir otro taller" desde la pantalla de espera.
+        'categoria': widget.categoria,
+        'latitud': widget.latitud,
+        'longitud': widget.longitud,
       },
     );
   }
@@ -178,7 +208,7 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Talleres compatibles'),
+            Text(widget.modoCambio ? 'Cambiar de taller' : 'Talleres compatibles'),
             Text(
               widget.categoria.nombre,
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.normal),
@@ -186,11 +216,13 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            tooltip: 'Cancelar reporte',
-            onPressed: _confirmando ? null : _cancelarReporte,
-          ),
+          // En modo cambio no hay "cancelar reporte" (la espera tiene su cancelar).
+          if (!widget.modoCambio)
+            IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'Cancelar reporte',
+              onPressed: _confirmando ? null : _cancelarReporte,
+            ),
         ],
       ),
       body: Column(

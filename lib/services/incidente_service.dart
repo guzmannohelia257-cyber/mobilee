@@ -138,6 +138,14 @@ class IncidenteService {
     }
   }
 
+  /// True si la excepcion es de red / sin conexion (host no resuelve, timeout).
+  bool _esErrorDeRed(Object e) {
+    if (e is SocketException || e is TimeoutException) return true;
+    if (e is http.ClientException) return true;
+    final s = e.toString();
+    return s.contains('SocketException') || s.contains('Failed host lookup');
+  }
+
   /// Confirma el borrador de incidente eligiendo (opcionalmente) un taller.
   /// Promueve el estado a 'pendiente' y dispara el broadcast a talleres.
   Future<Map<String, dynamic>> confirmarIncidencia({
@@ -183,7 +191,13 @@ class IncidenteService {
       };
     } catch (e) {
       debugPrint('[INCIDENTE] confirmar exception: $e');
-      return {'success': false, 'error': 'Error: $e'};
+      return {
+        'success': false,
+        'error': _esErrorDeRed(e)
+            ? 'Sin conexión: necesitas internet para confirmar el taller. '
+                'Revisa tu conexión e inténtalo de nuevo.'
+            : 'No se pudo confirmar el taller. Inténtalo de nuevo.',
+      };
     }
   }
 
@@ -720,7 +734,12 @@ class IncidenteService {
         'error': body['detail']?.toString() ?? 'No se pudo cambiar de taller',
       };
     } catch (e) {
-      return {'success': false, 'error': 'Error: $e'};
+      return {
+        'success': false,
+        'error': _esErrorDeRed(e)
+            ? 'Sin conexión: necesitas internet para cambiar de taller.'
+            : 'No se pudo cambiar de taller. Inténtalo de nuevo.',
+      };
     }
   }
 }

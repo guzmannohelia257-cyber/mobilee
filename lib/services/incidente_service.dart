@@ -94,6 +94,17 @@ class IncidenteService {
         };
       } else if (response.statusCode == 404) {
         return {'success': false, 'error': 'Vehículo no encontrado'};
+      } else if (response.statusCode == 409) {
+        // Ya hay un incidente activo. Mostramos el detalle del backend, que
+        // incluye el numero del incidente que bloquea y que hay que
+        // cancelar/esperar antes de reportar otro.
+        final error = jsonDecode(response.body);
+        return {
+          'success': false,
+          'error': error['detail']?.toString() ??
+              'Ya tienes una emergencia activa. Cancélala o espera a que sea '
+                  'atendida antes de reportar otra.',
+        };
       }
 
       return {'success': false, 'error': 'Error al reportar emergencia'};

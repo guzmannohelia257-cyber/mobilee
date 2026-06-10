@@ -85,10 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (raw is String) {
         msg = raw;
       } else if (raw is List && raw.isNotEmpty) {
-        msg = raw.map((e) {
-          if (e is Map && e['msg'] != null) return e['msg'].toString();
-          return e.toString();
-        }).join(', ');
+        msg = raw
+            .map((e) {
+              if (e is Map && e['msg'] != null) return e['msg'].toString();
+              return e.toString();
+            })
+            .join(', ');
       } else {
         msg = raw?.toString() ?? 'Error en el login';
       }
@@ -126,8 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
               final confirmPassword = confirmPasswordController.text;
 
               if (nombre.length < 3) {
-                setSheetState(() =>
-                    error = 'Ingresa tu nombre completo (mínimo 3 caracteres).');
+                setSheetState(
+                  () => error =
+                      'Ingresa tu nombre completo (mínimo 3 caracteres).',
+                );
                 return;
               }
               if (email.isEmpty || !email.contains('@')) {
@@ -135,8 +139,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 return;
               }
               if (password.length < 8) {
-                setSheetState(() =>
-                    error = 'La contraseña debe tener al menos 8 caracteres.');
+                setSheetState(
+                  () =>
+                      error = 'La contraseña debe tener al menos 8 caracteres.',
+                );
                 return;
               }
               if (password != confirmPassword) {
@@ -190,8 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(
                 decoration: const BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(28)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
                 padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
                 child: SingleChildScrollView(
@@ -296,8 +301,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   height: 22,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.4,
-                                    valueColor:
-                                        AlwaysStoppedAnimation(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation(
+                                      Colors.white,
+                                    ),
                                   ),
                                 )
                               : const Text('Crear cuenta'),
@@ -339,12 +345,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _irASelectorTallerTecnico() {
-    AppLogger.info('Tecnico: redirigiendo al selector de taller (M9)',
-        tag: _tag);
+    AppLogger.info(
+      'Tecnico: redirigiendo al selector de taller (M9)',
+      tag: _tag,
+    );
     Navigator.of(context).pushNamed('/seleccionar-taller-login');
   }
 
-  Future<void> _handleLoginWithCredentials(String email, String password) async {
+  Future<void> _handleLoginWithCredentials(
+    String email,
+    String password,
+  ) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -369,9 +380,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await _authService.logout();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Selecciona tu taller para continuar.'),
-          ),
+          const SnackBar(content: Text('Selecciona tu taller para continuar.')),
         );
         Navigator.of(context).pushReplacementNamed('/seleccionar-taller-login');
       }
@@ -381,10 +390,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (raw is String) {
         msg = raw;
       } else if (raw is List && raw.isNotEmpty) {
-        msg = raw.map((e) {
-          if (e is Map && e['msg'] != null) return e['msg'].toString();
-          return e.toString();
-        }).join(', ');
+        msg = raw
+            .map((e) {
+              if (e is Map && e['msg'] != null) return e['msg'].toString();
+              return e.toString();
+            })
+            .join(', ');
       } else {
         msg = raw?.toString() ?? 'Error en el login';
       }
@@ -404,9 +415,9 @@ class _LoginScreenState extends State<LoginScreen> {
         _errorMessage = null;
       });
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesión local limpiada.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Sesión local limpiada.')));
     } catch (e) {
       setState(() {
         _errorMessage = 'Error al limpiar: $e';
@@ -515,242 +526,180 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          // Fondo con degradado principal
-          Container(
-            height: size.height * 0.42,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFC26849),
-                  Color(0xFF984B30),
-                  Color(0xFF6D3621),
-                ],
-                stops: [0.0, 0.55, 1.0],
-              ),
-            ),
-          ),
-          Positioned(
-            top: -120,
-            right: -80,
-            child: Container(
-              width: 320,
-              height: 320,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.06),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 40,
-            left: -60,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.04),
-              ),
-            ),
-          ),
-
-          SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Encabezado de marca
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const BrandMark(size: 56, onDark: true),
-                        const SizedBox(height: 22),
-                        Text(
-                          'Bienvenido',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.4,
-                            color: Colors.white.withValues(alpha: 0.78),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Encabezado de marca (centrado, sobre fondo claro)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 36, 24, 30),
+                child: Column(
+                  children: [
+                    const BrandMark(size: 60),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Flujo Emergencia',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Asistencia\nvehicular cuando\nmás la necesitas.',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.8,
-                            height: 1.15,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
-
-                  // Tarjeta del formulario superpuesta sobre el fondo
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusXl),
-                      boxShadow: AppColors.shadowLg,
-                      border: Border.all(
-                        color: AppColors.borderSubtle,
-                        width: 1,
+                    const SizedBox(height: 6),
+                    Text(
+                      'Asistencia vehicular cuando más la necesitas',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.inkMuted,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                  ],
+                ),
+              ),
+
+              // Tarjeta del formulario superpuesta sobre el fondo
+              Container(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+                  boxShadow: AppColors.shadowSm,
+                  border: Border.all(color: AppColors.border, width: 1),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Inicia sesión',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Ingresa tus credenciales para continuar.',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 24),
+                    _Field(
+                      controller: _emailController,
+                      enabled: !_isLoading,
+                      label: 'Correo electrónico',
+                      icon: Icons.alternate_email_rounded,
+                      keyboardType: TextInputType.emailAddress,
+                      onSubmit: () => _passwordFocus.requestFocus(),
+                    ),
+                    const SizedBox(height: 14),
+                    _Field(
+                      controller: _passwordController,
+                      focusNode: _passwordFocus,
+                      enabled: !_isLoading,
+                      label: 'Contraseña',
+                      icon: Icons.lock_outline_rounded,
+                      obscure: _obscurePassword,
+                      onSubmit: _handleLogin,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: AppColors.inkMuted,
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                      ),
+                    ),
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 16),
+                      _ErrorTile(message: _errorMessage!),
+                    ],
+                    const SizedBox(height: 22),
+                    SizedBox(
+                      height: 54,
+                      child: FilledButton(
+                        onPressed: _isLoading ? null : _handleLogin,
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.4,
+                                  valueColor: AlwaysStoppedAnimation(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text('Entrar'),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward_rounded, size: 18),
+                                ],
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Inicia sesión',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Ingresa tus credenciales para continuar.',
+                          '¿Eres nuevo aquí?',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        const SizedBox(height: 24),
-                        _Field(
-                          controller: _emailController,
-                          enabled: !_isLoading,
-                          label: 'Correo electrónico',
-                          icon: Icons.alternate_email_rounded,
-                          keyboardType: TextInputType.emailAddress,
-                          onSubmit: () => _passwordFocus.requestFocus(),
-                        ),
-                        const SizedBox(height: 14),
-                        _Field(
-                          controller: _passwordController,
-                          focusNode: _passwordFocus,
-                          enabled: !_isLoading,
-                          label: 'Contraseña',
-                          icon: Icons.lock_outline_rounded,
-                          obscure: _obscurePassword,
-                          onSubmit: _handleLogin,
-                          suffix: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: AppColors.inkMuted,
-                            ),
-                            onPressed: () => setState(() =>
-                                _obscurePassword = !_obscurePassword),
-                          ),
-                        ),
-                        if (_errorMessage != null) ...[
-                          const SizedBox(height: 16),
-                          _ErrorTile(message: _errorMessage!),
-                        ],
-                        const SizedBox(height: 22),
-                        SizedBox(
-                          height: 54,
-                          child: FilledButton(
-                            onPressed: _isLoading ? null : _handleLogin,
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.4,
-                                      valueColor: AlwaysStoppedAnimation(
-                                          Colors.white),
-                                    ),
-                                  )
-                                : Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: const [
-                                      Text('Entrar'),
-                                      SizedBox(width: 8),
-                                      Icon(Icons.arrow_forward_rounded,
-                                          size: 18),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '¿Eres nuevo aquí?',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium,
-                            ),
-                            TextButton(
-                              onPressed: _isLoading
-                                  ? null
-                                  : _mostrarRegistroCliente,
-                              child: const Text('Crear cuenta'),
-                            ),
-                          ],
-                        ),
-                        const Divider(height: 24),
-                        _QuickCredRow(
-                          disabled: _isLoading,
-                          onConductor: _autoLoginConductor,
-                          onTecnico: _irASelectorTallerTecnico,
+                        TextButton(
+                          onPressed: _isLoading
+                              ? null
+                              : _mostrarRegistroCliente,
+                          child: const Text('Crear cuenta'),
                         ),
                       ],
                     ),
-                  ),
-
-                  // Acceso para técnicos
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20),
-                    child: _RoleSwitchCard(
-                      onTap: _isLoading
-                          ? null
-                          : _irASelectorTallerTecnico,
+                    const Divider(height: 24),
+                    _QuickCredRow(
+                      disabled: _isLoading,
+                      onConductor: _autoLoginConductor,
+                      onTecnico: _irASelectorTallerTecnico,
                     ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // Nota legal del pie
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Text(
-                        'Flujo Emergencia · Asistencia vehicular 24/7',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.2,
-                          color: AppColors.inkFaint,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                ],
+                  ],
+                ),
               ),
-            ),
+
+              // Acceso para técnicos
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _RoleSwitchCard(
+                  onTap: _isLoading ? null : _irASelectorTallerTecnico,
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Nota legal del pie
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    'Flujo Emergencia · Asistencia vehicular 24/7',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.2,
+                      color: AppColors.inkFaint,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+            ],
           ),
-        ],
+        ),
       ),
       floatingActionButton: _DevFab(onTap: _showDevMenu),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -789,8 +738,9 @@ class _Field extends StatelessWidget {
       enabled: enabled,
       obscureText: obscure,
       keyboardType: keyboardType,
-      textInputAction:
-          onSubmit != null ? TextInputAction.next : TextInputAction.done,
+      textInputAction: onSubmit != null
+          ? TextInputAction.next
+          : TextInputAction.done,
       onSubmitted: (_) => onSubmit?.call(),
       style: const TextStyle(
         fontSize: 15,
@@ -803,8 +753,10 @@ class _Field extends StatelessWidget {
           padding: const EdgeInsets.only(left: 14, right: 10),
           child: Icon(icon, size: 20),
         ),
-        prefixIconConstraints:
-            const BoxConstraints(minWidth: 44, minHeight: 22),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 44,
+          minHeight: 22,
+        ),
         suffixIcon: suffix,
       ),
     );
@@ -830,8 +782,11 @@ class _ErrorTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.error_outline_rounded,
-              color: AppColors.brand, size: 18),
+          const Icon(
+            Icons.error_outline_rounded,
+            color: AppColors.brand,
+            size: 18,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -866,10 +821,7 @@ class _RoleSwitchCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-            border: Border.all(
-              color: AppColors.borderSubtle,
-              width: 1,
-            ),
+            border: Border.all(color: AppColors.borderSubtle, width: 1),
           ),
           child: Row(
             children: [
@@ -893,10 +845,9 @@ class _RoleSwitchCard extends StatelessWidget {
                   children: [
                     Text(
                       'Acceso para técnicos',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w600),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -906,8 +857,11 @@ class _RoleSwitchCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_rounded,
-                  color: AppColors.inkMuted, size: 18),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                color: AppColors.inkMuted,
+                size: 18,
+              ),
             ],
           ),
         ),
@@ -952,11 +906,11 @@ class _DevTile extends StatelessWidget {
                       : AppColors.overlay,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon,
-                    size: 20,
-                    color: isDestructive
-                        ? AppColors.brand
-                        : AppColors.inkSubtle),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: isDestructive ? AppColors.brand : AppColors.inkSubtle,
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -981,8 +935,10 @@ class _DevTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.inkFaint),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.inkFaint,
+              ),
             ],
           ),
         ),
@@ -1090,11 +1046,7 @@ class _DevFab extends StatelessWidget {
           child: const SizedBox(
             width: 52,
             height: 52,
-            child: Icon(
-              Icons.tune_rounded,
-              color: Colors.white,
-              size: 22,
-            ),
+            child: Icon(Icons.tune_rounded, color: Colors.white, size: 22),
           ),
         ),
       ),

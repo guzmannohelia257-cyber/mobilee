@@ -54,8 +54,9 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
   @override
   void initState() {
     super.initState();
-    _descripcionController =
-        TextEditingController(text: widget.descripcionInicial ?? '');
+    _descripcionController = TextEditingController(
+      text: widget.descripcionInicial ?? '',
+    );
     vehiculoSeleccionado = widget.idVehiculoInicial;
     latitud = widget.latitudInicial;
     longitud = widget.longitudInicial;
@@ -64,15 +65,17 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
 
   /// Guarda el progreso (paso 1) para poder reanudar el reporte mas tarde.
   void _persistirPaso1() {
-    _draftService.guardar(WizardDraft(
-      paso: 1,
-      idVehiculo: vehiculoSeleccionado,
-      descripcion: _descripcionController.text.trim(),
-      latitud: latitud,
-      longitud: longitud,
-      ubicacionTexto: ubicacionTexto,
-      idempotencyKey: _idempotencyKey,
-    ));
+    _draftService.guardar(
+      WizardDraft(
+        paso: 1,
+        idVehiculo: vehiculoSeleccionado,
+        descripcion: _descripcionController.text.trim(),
+        latitud: latitud,
+        longitud: longitud,
+        ubicacionTexto: ubicacionTexto,
+        idempotencyKey: _idempotencyKey,
+      ),
+    );
   }
 
   @override
@@ -99,9 +102,7 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
       _persistirPaso1();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Ubicación obtenida correctamente.'),
-        ),
+        const SnackBar(content: Text('Ubicación obtenida correctamente.')),
       );
     } else {
       setState(() {
@@ -139,15 +140,17 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
     }
 
     // Avanza el progreso al paso 2 (evidencias) antes de navegar.
-    _draftService.guardar(WizardDraft(
-      paso: 2,
-      idVehiculo: vehiculoSeleccionado,
-      descripcion: _descripcionController.text.trim(),
-      latitud: latitud,
-      longitud: longitud,
-      ubicacionTexto: ubicacionTexto,
-      idempotencyKey: _idempotencyKey,
-    ));
+    _draftService.guardar(
+      WizardDraft(
+        paso: 2,
+        idVehiculo: vehiculoSeleccionado,
+        descripcion: _descripcionController.text.trim(),
+        latitud: latitud,
+        longitud: longitud,
+        ubicacionTexto: ubicacionTexto,
+        idempotencyKey: _idempotencyKey,
+      ),
+    );
 
     Navigator.push(
       context,
@@ -200,8 +203,10 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
                   hintText: 'Vehículo afectado',
                   prefixIcon: Icon(Icons.directions_car_outlined),
                 ),
-                icon: const Icon(Icons.expand_more_rounded,
-                    color: AppColors.inkMuted),
+                icon: const Icon(
+                  Icons.expand_more_rounded,
+                  color: AppColors.inkMuted,
+                ),
                 items: widget.vehiculos.isEmpty
                     ? const [
                         DropdownMenuItem(
@@ -214,9 +219,7 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
                           value: v['id_vehiculo'],
                           child: Text(
                             '${v['marca']} ${v['modelo']} · ${v['placa']}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: const TextStyle(fontWeight: FontWeight.w500),
                           ),
                         );
                       }).toList(),
@@ -226,8 +229,7 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
                         setState(() => vehiculoSeleccionado = v);
                         _persistirPaso1();
                       },
-                validator: (v) =>
-                    v == null ? 'Selecciona un vehículo' : null,
+                validator: (v) => v == null ? 'Selecciona un vehículo' : null,
               ),
               const SizedBox(height: 24),
 
@@ -292,34 +294,25 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFC26849), Color(0xFF984B30)],
-        ),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.brand.withValues(alpha: 0.24),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        border: Border.all(color: AppColors.border, width: 1),
+        boxShadow: AppColors.shadowSm,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(12),
+              color: AppColors.brandSoft,
+              borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
               Icons.warning_amber_rounded,
-              color: Colors.white,
-              size: 22,
+              color: AppColors.brand,
+              size: 24,
             ),
           ),
           const SizedBox(width: 14),
@@ -327,22 +320,19 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Asistencia en camino',
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'Llena estos pasos y un técnico cercano será asignado automáticamente.',
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.45,
-                    color: Colors.white.withValues(alpha: 0.86),
+                    color: AppColors.inkSubtle,
                   ),
                 ),
               ],
@@ -384,9 +374,7 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
                   tieneUbicacion
                       ? Icons.gps_fixed_rounded
                       : Icons.gps_not_fixed_rounded,
-                  color: tieneUbicacion
-                      ? AppColors.forest
-                      : AppColors.inkMuted,
+                  color: tieneUbicacion ? AppColors.forest : AppColors.inkMuted,
                   size: 20,
                 ),
               ),
@@ -441,8 +429,8 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
                 obteniendo
                     ? 'Obteniendo ubicación…'
                     : tieneUbicacion
-                        ? 'Actualizar ubicación'
-                        : 'Obtener mi ubicación',
+                    ? 'Actualizar ubicación'
+                    : 'Obtener mi ubicación',
               ),
             ),
           ),
@@ -471,8 +459,11 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
                   color: AppColors.indigoSoft,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.lightbulb_outline_rounded,
-                    color: AppColors.indigo, size: 18),
+                child: const Icon(
+                  Icons.lightbulb_outline_rounded,
+                  color: AppColors.indigo,
+                  size: 18,
+                ),
               ),
               const SizedBox(width: 12),
               Text(
@@ -502,26 +493,27 @@ class _StepLabel extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: AppColors.brandSoft,
-            borderRadius: BorderRadius.circular(6),
+          width: 26,
+          height: 26,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            color: AppColors.brand,
+            shape: BoxShape.circle,
           ),
           child: Text(
             number,
             style: const TextStyle(
-              fontSize: 11,
+              fontSize: 11.5,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0.6,
-              color: AppColors.brand,
+              color: Colors.white,
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Text(
           text,
           style: const TextStyle(
-            fontSize: 15,
+            fontSize: 15.5,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.1,
             color: AppColors.ink,
@@ -545,8 +537,7 @@ class _Tip extends StatelessWidget {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 7),
-            child: Icon(Icons.check_rounded,
-                size: 14, color: AppColors.forest),
+            child: Icon(Icons.check_rounded, size: 14, color: AppColors.forest),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -576,15 +567,16 @@ class _ErrorBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.brandSoft,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.brand.withValues(alpha: 0.25),
-        ),
+        border: Border.all(color: AppColors.brand.withValues(alpha: 0.25)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.error_outline_rounded,
-              color: AppColors.brand, size: 18),
+          const Icon(
+            Icons.error_outline_rounded,
+            color: AppColors.brand,
+            size: 18,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

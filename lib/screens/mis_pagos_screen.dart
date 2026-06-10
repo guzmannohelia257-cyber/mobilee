@@ -119,7 +119,7 @@ class _MisPagosScreenState extends State<MisPagosScreen>
           ),
           appearance: const PaymentSheetAppearance(
             colors: PaymentSheetAppearanceColors(
-              primary: Color(0xFFD32F2F),
+              primary: Color(0xFFC26849),
             ),
           ),
         ),

@@ -65,8 +65,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   String _initials(String nombre) {
-    final parts =
-        nombre.trim().split(' ').where((s) => s.isNotEmpty).toList();
+    final parts = nombre.trim().split(' ').where((s) => s.isNotEmpty).toList();
     if (parts.isEmpty) return '?';
     if (parts.length == 1) return parts.first[0].toUpperCase();
     return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -97,8 +96,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
       body: cargando
           ? const Center(child: CircularProgressIndicator())
           : error != null
-              ? _buildError()
-              : _buildContent(),
+          ? _buildError()
+          : _buildContent(),
     );
   }
 
@@ -158,126 +157,72 @@ class _PerfilScreenState extends State<PerfilScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-            padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1F2937),
-                  Color(0xFF0B1220),
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.slate.withValues(alpha: 0.24),
-                  blurRadius: 24,
-                  offset: const Offset(0, 12),
-                ),
-              ],
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: -50,
-                  right: -30,
-                  child: Container(
-                    width: 160,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.brand.withValues(alpha: 0.16),
-                    ),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        _Avatar(initials: _initials(nombre)),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _getRolNombre(usuario!['id_rol']),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.4,
-                                  color:
-                                      Colors.white.withValues(alpha: 0.65),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                nombre,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.4,
-                                  color: Colors.white,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 22),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: activo
-                            ? AppColors.forest.withValues(alpha: 0.18)
-                            : AppColors.brand.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(
-                          color: activo
-                              ? AppColors.forest.withValues(alpha: 0.4)
-                              : AppColors.brand.withValues(alpha: 0.4),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 7,
-                            height: 7,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: activo
-                                  ? const Color(0xFF22C55E)
-                                  : AppColors.brand,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            activo ? 'Cuenta activa' : 'Cuenta inactiva',
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.6,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+          const SizedBox(height: 20),
+          Center(child: _Avatar(initials: _initials(nombre))),
+          const SizedBox(height: 16),
+          Text(
+            nombre,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.4,
             ),
           ),
+          const SizedBox(height: 6),
+          Text(
+            _getRolNombre(usuario!['id_rol']),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.4,
+              color: AppColors.inkMuted,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+              decoration: BoxDecoration(
+                color: activo ? AppColors.forestSoft : AppColors.dangerSoft,
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(
+                  color: activo
+                      ? AppColors.forest.withValues(alpha: 0.4)
+                      : AppColors.danger.withValues(alpha: 0.4),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: activo ? AppColors.forest : AppColors.danger,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    activo ? 'Cuenta activa' : 'Cuenta inactiva',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.4,
+                      color: activo
+                          ? AppColors.forest
+                          : AppColors.dangerInk,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 28),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
@@ -297,10 +242,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                border: Border.all(
-                  color: AppColors.borderSubtle,
-                  width: 1,
-                ),
+                border: Border.all(color: AppColors.borderSubtle, width: 1),
               ),
               child: Column(
                 children: [
@@ -346,10 +288,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                border: Border.all(
-                  color: AppColors.borderSubtle,
-                  width: 1,
-                ),
+                border: Border.all(color: AppColors.borderSubtle, width: 1),
               ),
               child: Column(
                 children: [
@@ -364,8 +303,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     icon: Icons.directions_car_outlined,
                     title: 'Mis vehículos',
                     subtitle: 'Gestionar vehículos registrados',
-                    onTap: () =>
-                        Navigator.pushNamed(context, '/mis-vehiculos'),
+                    onTap: () => Navigator.pushNamed(context, '/mis-vehiculos'),
                   ),
                 ],
               ),
@@ -499,9 +437,7 @@ class _InfoRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    color: placeholder
-                        ? AppColors.inkFaint
-                        : AppColors.ink,
+                    color: placeholder ? AppColors.inkFaint : AppColors.ink,
                   ),
                 ),
               ],
@@ -568,8 +504,10 @@ class _ActionRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.inkFaint),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.inkFaint,
+              ),
             ],
           ),
         ),

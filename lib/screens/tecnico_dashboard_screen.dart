@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -294,7 +294,11 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
         todas.add(e);
       }
     }
-    if (mounted) setState(() { _evidencias = todas; _loadingEvidencias = false; });
+    if (mounted)
+      setState(() {
+        _evidencias = todas;
+        _loadingEvidencias = false;
+      });
   }
 
   Future<void> _handleIniciarViaje() async {
@@ -307,23 +311,33 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
     // otra via o el realtime aun no refresco), recargamos y salimos en vez de
     // reintentar una transicion invalida.
     if (_asignacion!.estadoAsignacion != 'aceptada') {
-      _log('_handleIniciarViaje -> estado!=aceptada (${_asignacion!.estadoAsignacion}), recargando');
+      _log(
+        '_handleIniciarViaje -> estado!=aceptada (${_asignacion!.estadoAsignacion}), recargando',
+      );
       await _loadAsignacion();
       return;
     }
 
-    _log('_handleIniciarViaje -> INICIO idAsignacion=${_asignacion!.idAsignacion} estado=${_asignacion!.estadoAsignacion}');
+    _log(
+      '_handleIniciarViaje -> INICIO idAsignacion=${_asignacion!.idAsignacion} estado=${_asignacion!.estadoAsignacion}',
+    );
 
     setState(() => _accionEnCurso = true);
     try {
-      final updated = await _tecnicoService.iniciarViaje(_asignacion!.idAsignacion);
+      final updated = await _tecnicoService.iniciarViaje(
+        _asignacion!.idAsignacion,
+      );
       _log('_handleIniciarViaje -> OK nuevoEstado=${updated.estadoAsignacion}');
       setState(() => _asignacion = updated);
       _tecnicoService.iniciarSeguimientoUbicacion();
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Viaje iniciado. Compartiendo ubicación en tiempo real.')),
+        const SnackBar(
+          content: Text(
+            'Viaje iniciado. Compartiendo ubicación en tiempo real.',
+          ),
+        ),
       );
     } catch (e, st) {
       _log('_handleIniciarViaje -> ERROR: $e');
@@ -336,12 +350,14 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
       if (raw.contains('iniciar viaje') ||
           raw.contains('en_camino') ||
           raw.contains('aceptada')) {
-        _log('_handleIniciarViaje -> transicion ya aplicada, recargando silenciosamente');
+        _log(
+          '_handleIniciarViaje -> transicion ya aplicada, recargando silenciosamente',
+        );
         await _loadAsignacion();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_mapError(e))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_mapError(e))));
       }
     } finally {
       if (mounted) setState(() => _accionEnCurso = false);
@@ -353,12 +369,16 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
     _log('_handleLlegue -> INICIO idAsignacion=${_asignacion!.idAsignacion}');
     setState(() => _accionEnCurso = true);
     try {
-      final updated = await _tecnicoService.marcarLlegada(_asignacion!.idAsignacion);
+      final updated = await _tecnicoService.marcarLlegada(
+        _asignacion!.idAsignacion,
+      );
       _log('_handleLlegue -> OK nuevoEstado=${updated.estadoAsignacion}');
       setState(() => _asignacion = updated);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Llegada marcada. Ya puedes finalizar el servicio.')),
+        const SnackBar(
+          content: Text('Llegada marcada. Ya puedes finalizar el servicio.'),
+        ),
       );
     } catch (e, st) {
       _log('_handleLlegue -> ERROR: $e');
@@ -369,9 +389,9 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
       if (raw.contains('llegado') || raw.contains('marcar llegada')) {
         await _loadAsignacion();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_mapError(e))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_mapError(e))));
       }
     } finally {
       if (mounted) setState(() => _accionEnCurso = false);
@@ -382,7 +402,9 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
     // Mismo guard que en iniciar viaje: evita abrir el dialogo o reenviar
     // mientras ya hay una accion en curso.
     if (_accionEnCurso || _asignacion == null) return;
-    _log('_handleCompletar -> abrir dialogo idAsignacion=${_asignacion!.idAsignacion} estado=${_asignacion!.estadoAsignacion}');
+    _log(
+      '_handleCompletar -> abrir dialogo idAsignacion=${_asignacion!.idAsignacion} estado=${_asignacion!.estadoAsignacion}',
+    );
 
     final resumenController = TextEditingController();
     // Pre-cargamos el cobro con la cotizacion que vio el cliente (si existe),
@@ -406,9 +428,9 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: AppColors.slateSoft,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.shade200),
+                    border: Border.all(color: AppColors.slate),
                   ),
                   child: Text(
                     'Cotización que vio el cliente: Bs ${_asignacion!.costoEstimado!.toStringAsFixed(2)}',
@@ -455,7 +477,9 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                 if (costo == null || costo <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Ingresa el monto final del servicio (mayor a 0).'),
+                      content: Text(
+                        'Ingresa el monto final del servicio (mayor a 0).',
+                      ),
                     ),
                   );
                   return;
@@ -471,14 +495,18 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                       ? null
                       : resumenController.text.trim();
 
-                  _log('_handleCompletar -> enviando completar costo=$costo resumenLen=${resumen?.length ?? 0}');
+                  _log(
+                    '_handleCompletar -> enviando completar costo=$costo resumenLen=${resumen?.length ?? 0}',
+                  );
 
                   final updated = await _tecnicoService.completar(
                     _asignacion!.idAsignacion,
                     costoFinal: costo,
                     resumenTrabajo: resumen,
                   );
-                  _log('_handleCompletar -> OK nuevoEstado=${updated.estadoAsignacion}');
+                  _log(
+                    '_handleCompletar -> OK nuevoEstado=${updated.estadoAsignacion}',
+                  );
                   setState(() => _asignacion = updated);
                   _tecnicoService.detenerSeguimientoUbicacion();
 
@@ -490,9 +518,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                   _log('_handleCompletar -> ERROR: $e');
                   _log('_handleCompletar -> STACK: $st');
                   if (!mounted) return;
-                  messenger.showSnackBar(
-                    SnackBar(content: Text(_mapError(e))),
-                  );
+                  messenger.showSnackBar(SnackBar(content: Text(_mapError(e))));
                 } finally {
                   if (mounted) setState(() => _accionEnCurso = false);
                 }
@@ -540,17 +566,17 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
   Color _getColorForEstado(String estado) {
     switch (estado) {
       case 'pendiente':
-        return Colors.grey;
+        return AppColors.inkMuted;
       case 'aceptada':
-        return Colors.green;
+        return AppColors.forest;
       case 'en_camino':
-        return Colors.blue;
+        return AppColors.slate;
       case 'llegado':
-        return Colors.indigo;
+        return AppColors.brand;
       case 'completada':
-        return Colors.teal;
+        return AppColors.forest;
       default:
-        return Colors.grey;
+        return AppColors.inkMuted;
     }
   }
 
@@ -599,9 +625,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
         onPressed: _abrirRutaCliente,
         icon: const Icon(Icons.navigation),
         label: const Text('Ver ruta al cliente'),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(0, 48),
-        ),
+        style: OutlinedButton.styleFrom(minimumSize: const Size(0, 48)),
       ),
     );
   }
@@ -612,7 +636,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
     switch (_asignacion!.estadoAsignacion) {
       case 'pendiente':
         return Card(
-          color: Colors.grey[200],
+          color: AppColors.surfaceMuted,
           child: const Padding(
             padding: EdgeInsets.all(12),
             child: Text(
@@ -632,7 +656,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                 icon: const Icon(Icons.directions_car),
                 label: const Text('Iniciar Viaje'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: AppColors.amber,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -652,7 +676,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                 icon: const Icon(Icons.location_on),
                 label: const Text('Ya llegué'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: AppColors.slate,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -670,7 +694,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
             icon: const Icon(Icons.check_circle),
             label: const Text('Terminar / Finalizar'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.forest,
               foregroundColor: Colors.white,
             ),
           ),
@@ -678,7 +702,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
 
       case 'completada':
         return Card(
-          color: Colors.green[50],
+          color: AppColors.forestSoft,
           child: const Padding(
             padding: EdgeInsets.all(12),
             child: Text(
@@ -706,7 +730,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
         padding: EdgeInsets.symmetric(vertical: 4),
         child: Text(
           'El cliente no subió evidencias.',
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: AppColors.inkMuted),
         ),
       );
     }
@@ -729,8 +753,10 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Container(
               height: 80,
-              color: Colors.grey[200],
-              child: const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+              color: AppColors.surfaceMuted,
+              child: const Center(
+                child: Icon(Icons.broken_image, color: AppColors.inkMuted),
+              ),
             ),
           ),
         ),
@@ -741,12 +767,16 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
       return ListTile(
         contentPadding: EdgeInsets.zero,
         leading: const CircleAvatar(
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.amber,
           child: Icon(Icons.mic, color: Colors.white),
         ),
         title: const Text('Audio del cliente'),
         subtitle: ev.transcripcionAudio != null
-            ? Text(ev.transcripcionAudio!, maxLines: 2, overflow: TextOverflow.ellipsis)
+            ? Text(
+                ev.transcripcionAudio!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              )
             : null,
       );
     }
@@ -755,7 +785,7 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: const CircleAvatar(
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.slate,
         child: Icon(Icons.description, color: Colors.white),
       ),
       title: const Text('Descripción adicional'),
@@ -764,18 +794,19 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
   }
 
   Widget _buildGpsIndicator() {
-    if (_asignacion?.estadoAsignacion != 'en_camino') return const SizedBox.shrink();
+    if (_asignacion?.estadoAsignacion != 'en_camino')
+      return const SizedBox.shrink();
     return Card(
-      color: Colors.blue[50],
+      color: AppColors.slateSoft,
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           children: [
-            Icon(Icons.location_on, color: Colors.blue, size: 18),
+            Icon(Icons.location_on, color: AppColors.slate, size: 18),
             SizedBox(width: 8),
             Text(
               'Compartiendo ubicación en tiempo real',
-              style: TextStyle(color: Colors.blue, fontSize: 13),
+              style: TextStyle(color: AppColors.slate, fontSize: 13),
             ),
           ],
         ),
@@ -849,7 +880,10 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
               onPressed: () => Navigator.pushNamed(context, '/notificaciones'),
               tooltip: 'Notificaciones',
             ),
-            IconButton(icon: const Icon(Icons.refresh), onPressed: _loadAsignacion),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadAsignacion,
+            ),
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: _confirmLogout,
@@ -873,7 +907,10 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
             onPressed: () => Navigator.pushNamed(context, '/notificaciones'),
             tooltip: 'Notificaciones',
           ),
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadAsignacion),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadAsignacion,
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _confirmLogout,
@@ -899,7 +936,10 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Estado', style: TextStyle(color: Colors.white70)),
+                          const Text(
+                            'Estado',
+                            style: TextStyle(color: Colors.white70),
+                          ),
                           Text(
                             _asignacion!.estadoAsignacion.toUpperCase(),
                             style: const TextStyle(
@@ -923,7 +963,10 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
               if (_asignacion!.etaMinutos != null)
                 _buildTarjetaLlegada(_asignacion!),
               const SizedBox(height: 16),
-              Text('Detalle del Incidente', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Detalle del Incidente',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               Card(
                 child: Padding(
@@ -931,22 +974,49 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('👤 Cliente', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                      Text(
-                        _incidente?.usuario?['nombre'] ?? _asignacion!.incidente.usuario?['nombre'] ?? 'Nombre no disponible',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      const Text(
+                        '👤 Cliente',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.inkMuted,
+                        ),
                       ),
-                      if ((_incidente?.usuario?['telefono'] ?? _asignacion!.incidente.usuario?['telefono']) != null)
-                        Text('Tel: ${_incidente?.usuario?['telefono'] ?? _asignacion!.incidente.usuario?['telefono']}'),
-                      
+                      Text(
+                        _incidente?.usuario?['nombre'] ??
+                            _asignacion!.incidente.usuario?['nombre'] ??
+                            'Nombre no disponible',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      if ((_incidente?.usuario?['telefono'] ??
+                              _asignacion!.incidente.usuario?['telefono']) !=
+                          null)
+                        Text(
+                          'Tel: ${_incidente?.usuario?['telefono'] ?? _asignacion!.incidente.usuario?['telefono']}',
+                        ),
+
                       const Divider(),
-                      
-                      const Text('🚗 Vehículo', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+
+                      const Text(
+                        '🚗 Vehículo',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.inkMuted,
+                        ),
+                      ),
                       Row(
                         children: [
                           Text(
-                            _incidente?.vehiculo?['placa'] ?? _asignacion!.incidente.vehiculo?['placa'] ?? 'Placa N/A',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue),
+                            _incidente?.vehiculo?['placa'] ??
+                                _asignacion!.incidente.vehiculo?['placa'] ??
+                                'Placa N/A',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: AppColors.slate,
+                            ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -957,20 +1027,48 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
                           ),
                         ],
                       ),
-                      if ((_incidente?.vehiculo?['color'] ?? _asignacion!.incidente.vehiculo?['color']) != null)
-                        Text('Color: ${_incidente?.vehiculo?['color'] ?? _asignacion!.incidente.vehiculo?['color']}'),
-                        
+                      if ((_incidente?.vehiculo?['color'] ??
+                              _asignacion!.incidente.vehiculo?['color']) !=
+                          null)
+                        Text(
+                          'Color: ${_incidente?.vehiculo?['color'] ?? _asignacion!.incidente.vehiculo?['color']}',
+                        ),
+
                       const Divider(),
-                      const Text('⚠️ Problema', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                      Text('Categoria: ${_incidente?.categoria ?? _asignacion!.incidente.categoria}'),
-                      Text('Prioridad: ${_incidente?.prioridad ?? _asignacion!.incidente.prioridad}'),
+                      const Text(
+                        '⚠️ Problema',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.inkMuted,
+                        ),
+                      ),
+                      Text(
+                        'Categoria: ${_incidente?.categoria ?? _asignacion!.incidente.categoria}',
+                      ),
+                      Text(
+                        'Prioridad: ${_incidente?.prioridad ?? _asignacion!.incidente.prioridad}',
+                      ),
                       const SizedBox(height: 4),
-                      const Text('Descripcion:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(_incidente?.descripcionUsuario ?? _asignacion!.incidente.descripcionUsuario),
-                      if ((_incidente?.resumenIa ?? _asignacion!.incidente.resumenIa) != null) ...[
+                      const Text(
+                        'Descripcion:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        _incidente?.descripcionUsuario ??
+                            _asignacion!.incidente.descripcionUsuario,
+                      ),
+                      if ((_incidente?.resumenIa ??
+                              _asignacion!.incidente.resumenIa) !=
+                          null) ...[
                         const SizedBox(height: 8),
-                        const Text('Analisis IA:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text((_incidente?.resumenIa ?? _asignacion!.incidente.resumenIa)!),
+                        const Text(
+                          'Analisis IA:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          (_incidente?.resumenIa ??
+                              _asignacion!.incidente.resumenIa)!,
+                        ),
                       ],
                     ],
                   ),
@@ -979,7 +1077,10 @@ class _TecnicoDashboardScreenState extends State<TecnicoDashboardScreen> {
               const SizedBox(height: 12),
               _buildGpsIndicator(),
               const SizedBox(height: 16),
-              Text('Evidencias del Cliente', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Evidencias del Cliente',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               Card(
                 child: Padding(

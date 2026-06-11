@@ -1,9 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../config/api_config.dart';
 import '../services/incidente_service.dart';
 import '../widgets/cancelar_button.dart';
 import 'package:app_emergencias/theme/app_colors.dart';
@@ -93,6 +98,104 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
     }
   }
 
+  /// Pide al backend el token público de esta asignación y muestra el enlace
+  /// `{webUrl}/track/{token}` para compartirlo con un tercero. Ese tercero verá
+  /// en vivo la ubicación del técnico y del cliente y la ruta que sigue.
+  Future<void> _compartirSeguimiento() async {
+    if (_idAsignacion == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Espera a que cargue el seguimiento e intenta de nuevo.')),
+      );
+      return;
+    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+      final resp = await http.post(
+        Uri.parse(
+          '${ApiConfig.baseUrl}/asignaciones/$_idAsignacion/compartir-cliente',
+        ),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (!mounted) return;
+      Navigator.pop(context); // cierra el loading
+      if (resp.statusCode == 200) {
+        final shareToken =
+            (jsonDecode(resp.body) as Map<String, dynamic>)['token'] as String;
+        _mostrarDialogoLink('${ApiConfig.webUrl}/track/$shareToken');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('No se pudo generar el enlace. Intenta de nuevo.')),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Sin conexión: no se pudo generar el enlace.')),
+      );
+    }
+  }
+
+  void _mostrarDialogoLink(String link) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Row(children: [
+          Icon(Icons.share_location, color: Colors.blue),
+          SizedBox(width: 8),
+          Expanded(child: Text('Compartir seguimiento')),
+        ]),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Envía este enlace a quien quieras. Verá en vivo la ubicación del '
+              'técnico y la tuya, y la ruta que sigue, hasta que termine el servicio.',
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(link, style: const TextStyle(fontSize: 13)),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.copy, size: 18),
+            label: const Text('Copiar enlace'),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: link));
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text(
+                        'Enlace copiado. Pégalo en WhatsApp o donde quieras.')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cliente = LatLng(widget.clienteLat, widget.clienteLng);
@@ -116,6 +219,11 @@ class _TecnicoTrackingScreenState extends State<TecnicoTrackingScreen> {
       appBar: AppBar(
         title: Text('Seguimiento #${widget.idIncidente}'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.share_location),
+            tooltip: 'Compartir seguimiento',
+            onPressed: _compartirSeguimiento,
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Actualizar',

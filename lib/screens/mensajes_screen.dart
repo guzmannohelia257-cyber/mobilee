@@ -15,7 +15,8 @@ class MensajesScreen extends StatefulWidget {
   State<MensajesScreen> createState() => _MensajesScreenState();
 }
 
-class _MensajesScreenState extends State<MensajesScreen> {
+class _MensajesScreenState extends State<MensajesScreen>
+    with WidgetsBindingObserver {
   final MensajesService _service = MensajesService();
   final AuthService _authService = AuthService();
   final TextEditingController _ctrl = TextEditingController();
@@ -32,13 +33,26 @@ class _MensajesScreenState extends State<MensajesScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cargarUserId();
     _cargar();
     _timer = Timer.periodic(const Duration(seconds: 10), (_) => _cargar());
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // El Timer periodico se pausa en background (Android/iOS suspenden
+    // temporizadores); sin esto, si dejas el chat abierto y vuelves sin pasar
+    // por una notificacion (que abre una pantalla nueva y por lo tanto refresca),
+    // te quedas viendo mensajes viejos hasta el proximo tick de 10s.
+    if (state == AppLifecycleState.resumed) {
+      _cargar();
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _ctrl.dispose();
     _scroll.dispose();

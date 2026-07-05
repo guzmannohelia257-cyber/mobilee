@@ -8,6 +8,7 @@ import 'theme/app_theme.dart';
 import 'theme/app_colors.dart';
 import 'widgets/brand_mark.dart';
 import 'screens/login_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/conductor_home.dart';
 import 'screens/tecnico_dashboard_screen.dart';
 import 'screens/mis_vehiculos_screen.dart';
@@ -28,6 +29,7 @@ import 'screens/cliente_tracking_screen.dart';
 import 'screens/seleccionar_taller_login_screen.dart';
 import 'config/stripe_config.dart';
 import 'services/auth_service.dart';
+import 'services/onboarding_service.dart';
 import 'services/tecnico_auth_service.dart';
 import 'services/notification_service.dart';
 import 'services/realtime_service.dart';
@@ -105,6 +107,7 @@ class MyApp extends StatelessWidget {
       home: const _InitialScreen(),
       routes: {
         '/login': (context) => const LoginScreen(),
+        '/onboarding': (context) => const OnboardingScreen(),
         '/conductor-home': (context) => const ConductorHomeScreen(),
         '/tecnico-home': (context) => const TecnicoDashboardScreen(),
         '/tecnico-dashboard': (context) => const TecnicoDashboardScreen(),
@@ -220,9 +223,18 @@ class _InitialScreenState extends State<_InitialScreen> {
     try {
       AppLogger.debug('Esperando 500ms antes de verificar...', tag: 'INITIAL_SCREEN');
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
+      // Gate de onboarding: primer arranque -> tutorial, luego nunca más.
+      final vistoOnboarding = await OnboardingService().yaVisto();
+      if (!vistoOnboarding) {
+        AppLogger.info('Onboarding no visto, mostrando tutorial inicial', tag: 'INITIAL_SCREEN');
+        if (!mounted) return;
+        Navigator.of(context).pushReplacementNamed('/onboarding');
+        return;
+      }
+
       AppLogger.info('Verificando si hay sesión activa...', tag: 'INITIAL_SCREEN');
-      
+
       final isAuthenticated = await _authService.isAuthenticated();
       AppLogger.info('Estado de autenticación: ${isAuthenticated ? 'Autenticado ✅' : 'No autenticado ❌'}', tag: 'INITIAL_SCREEN');
 

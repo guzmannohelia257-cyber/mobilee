@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/onboarding_service.dart';
 import '../services/usuario_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
@@ -49,6 +50,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
     if (!mounted) return;
     setState(() => cargando = false);
+  }
+
+  void _verTutorial() async {
+    await OnboardingService().reiniciar();
+    if (!mounted) return;
+    Navigator.pushNamed(context, '/onboarding');
   }
 
   void irEditar() async {
@@ -304,6 +311,13 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     title: 'Mis vehículos',
                     subtitle: 'Gestionar vehículos registrados',
                     onTap: () => Navigator.pushNamed(context, '/mis-vehiculos'),
+                  ),
+                  const _RowDivider(),
+                  _ActionRow(
+                    icon: Icons.slideshow_outlined,
+                    title: 'Ver tutorial de nuevo',
+                    subtitle: 'Revisa la introducción de la app',
+                    onTap: _verTutorial,
                   ),
                 ],
               ),

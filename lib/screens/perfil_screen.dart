@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/billetera_service.dart';
-import '../services/onboarding_service.dart';
+import '../services/tour_service.dart';
 import '../services/usuario_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
@@ -65,9 +65,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   void _verTutorial() async {
-    await OnboardingService().reiniciar();
+    await TourService().reiniciar();
     if (!mounted) return;
-    Navigator.pushNamed(context, '/onboarding');
+    Navigator.pushNamedAndRemoveUntil(context, '/conductor-home', (route) => false);
   }
 
   void irEditar() async {

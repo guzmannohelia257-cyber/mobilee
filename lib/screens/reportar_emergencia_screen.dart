@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../services/incidente_service.dart';
 import '../services/offline/wizard_draft_service.dart';
+import '../services/tour_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import 'subir_evidencia_screen.dart';
@@ -50,6 +52,11 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
   bool obteniendo = false;
   String? ubicacionTexto;
   String? errorGeneral;
+  final GlobalKey _keySelectorVehiculo = GlobalKey();
+  final GlobalKey _keyDescripcion = GlobalKey();
+  final GlobalKey _keyUbicacion = GlobalKey();
+  final GlobalKey _keyContinuar = GlobalKey();
+  bool _mostrarSaltarTour = false;
 
   @override
   void initState() {
@@ -61,6 +68,29 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
     latitud = widget.latitudInicial;
     longitud = widget.longitudInicial;
     ubicacionTexto = widget.ubicacionTextoInicial;
+
+    // El tour marca "visto" en `onFinish` del ShowCaseWidget ancestro (ver
+    // conductor_home.dart) cuando este es el último paso; aquí solo
+    // disparamos el spotlight si el usuario todavía no lo vio.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final visto = await TourService().yaVisto();
+      if (!visto && mounted) {
+        setState(() => _mostrarSaltarTour = true);
+        ShowCaseWidget.of(context).startShowCase([
+          _keySelectorVehiculo,
+          _keyDescripcion,
+          _keyUbicacion,
+          _keyContinuar,
+        ]);
+      }
+    });
+  }
+
+  Future<void> _saltarTour() async {
+    await TourService().saltarTour();
+    if (!mounted) return;
+    setState(() => _mostrarSaltarTour = false);
+    ShowCaseWidget.of(context).dismiss();
   }
 
   /// Guarda el progreso (paso 1) para poder reanudar el reporte mas tarde.
@@ -178,6 +208,13 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          if (_mostrarSaltarTour)
+            TextButton(
+              onPressed: _saltarTour,
+              child: const Text('Saltar'),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -197,78 +234,112 @@ class _ReportarEmergenciaScreenState extends State<ReportarEmergenciaScreen> {
 
               _StepLabel(number: '01', text: 'Selecciona tu vehículo'),
               const SizedBox(height: 10),
-              DropdownButtonFormField<int>(
-                initialValue: vehiculoSeleccionado,
-                decoration: const InputDecoration(
-                  hintText: 'Vehículo afectado',
-                  prefixIcon: Icon(Icons.directions_car_outlined),
-                ),
-                icon: const Icon(
-                  Icons.expand_more_rounded,
-                  color: AppColors.inkMuted,
-                ),
-                items: widget.vehiculos.isEmpty
-                    ? const [
-                        DropdownMenuItem(
-                          enabled: false,
-                          child: Text('No tienes vehículos registrados'),
-                        ),
-                      ]
-                    : widget.vehiculos.map<DropdownMenuItem<int>>((v) {
-                        return DropdownMenuItem<int>(
-                          value: v['id_vehiculo'],
-                          child: Text(
-                            '${v['marca']} ${v['modelo']} · ${v['placa']}',
-                            style: const TextStyle(fontWeight: FontWeight.w500),
+              Showcase(
+                key: _keySelectorVehiculo,
+                // Decisión de producto: el tour SOLO explica en este paso —
+                // no agrega ningún botón/acción nueva a la pantalla.
+                description: widget.vehiculos.isEmpty
+                    ? 'Aún no tienes vehículos registrados. Necesitas agregar '
+                        'uno antes de reportar; hazlo desde "Mis Vehículos" '
+                        'en el menú.'
+                    : 'Selecciona el vehículo afectado. Si tienes varios, '
+                        'elige el correcto antes de continuar.',
+                child: DropdownButtonFormField<int>(
+                  initialValue: vehiculoSeleccionado,
+                  decoration: const InputDecoration(
+                    hintText: 'Vehículo afectado',
+                    prefixIcon: Icon(Icons.directions_car_outlined),
+                  ),
+                  icon: const Icon(
+                    Icons.expand_more_rounded,
+                    color: AppColors.inkMuted,
+                  ),
+                  items: widget.vehiculos.isEmpty
+                      ? const [
+                          DropdownMenuItem(
+                            enabled: false,
+                            child: Text('No tienes vehículos registrados'),
                           ),
-                        );
-                      }).toList(),
-                onChanged: widget.vehiculos.isEmpty
-                    ? null
-                    : (v) {
-                        setState(() => vehiculoSeleccionado = v);
-                        _persistirPaso1();
-                      },
-                validator: (v) => v == null ? 'Selecciona un vehículo' : null,
+                        ]
+                      : widget.vehiculos.map<DropdownMenuItem<int>>((v) {
+                          return DropdownMenuItem<int>(
+                            value: v['id_vehiculo'],
+                            child: Text(
+                              '${v['marca']} ${v['modelo']} · ${v['placa']}',
+                              style: const TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                          );
+                        }).toList(),
+                  onChanged: widget.vehiculos.isEmpty
+                      ? null
+                      : (v) {
+                          setState(() => vehiculoSeleccionado = v);
+                          _persistirPaso1();
+                        },
+                  validator: (v) => v == null ? 'Selecciona un vehículo' : null,
+                ),
               ),
               const SizedBox(height: 24),
 
               _StepLabel(number: '02', text: '¿Qué está pasando?'),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: _descripcionController,
-                maxLines: 5,
-                minLines: 4,
-                onChanged: (_) => _persistirPaso1(),
-                decoration: const InputDecoration(
-                  hintText:
-                      'Describe el problema. Por ejemplo: el motor no enciende, hay una llanta pinchada en la rueda delantera derecha…',
+              Showcase(
+                key: _keyDescripcion,
+                description: 'Cuéntanos brevemente qué pasó. Con una '
+                    'descripción clara el técnico llega mejor preparado.',
+                child: TextFormField(
+                  controller: _descripcionController,
+                  maxLines: 5,
+                  minLines: 4,
+                  onChanged: (_) => _persistirPaso1(),
+                  decoration: const InputDecoration(
+                    hintText:
+                        'Describe el problema. Por ejemplo: el motor no enciende, hay una llanta pinchada en la rueda delantera derecha…',
+                  ),
+                  validator: (v) {
+                    if (v?.isEmpty ?? true) return 'Ingresa una descripción';
+                    if (v!.length < 10) return 'Al menos 10 caracteres';
+                    return null;
+                  },
                 ),
-                validator: (v) {
-                  if (v?.isEmpty ?? true) return 'Ingresa una descripción';
-                  if (v!.length < 10) return 'Al menos 10 caracteres';
-                  return null;
-                },
               ),
               const SizedBox(height: 24),
 
               _StepLabel(number: '03', text: 'Comparte tu ubicación'),
               const SizedBox(height: 10),
-              _buildLocationCard(tieneUbicacion),
+              Showcase(
+                key: _keyUbicacion,
+                description: 'Toca "Obtener mi ubicación" para enviar tu '
+                    'posición GPS exacta al técnico.',
+                child: _buildLocationCard(tieneUbicacion),
+              ),
               const SizedBox(height: 32),
 
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: FilledButton(
-                  onPressed: _irASubirEvidencia,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.attach_file_rounded, size: 20),
-                      SizedBox(width: 10),
-                      Text('Continuar y subir evidencia'),
-                    ],
+              Showcase(
+                key: _keyContinuar,
+                description: 'Cuando completes los datos, toca aquí para '
+                    'continuar y subir fotos de la evidencia.',
+                // Último paso del tour: dispara la acción real (no solo
+                // avanza) y cierra el tour, igual que el patrón usado para
+                // el botón "Solicitar asistencia" en conductor_home.dart.
+                disposeOnTap: true,
+                onTargetClick: () {
+                  setState(() => _mostrarSaltarTour = false);
+                  _irASubirEvidencia();
+                },
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: _irASubirEvidencia,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.attach_file_rounded, size: 20),
+                        SizedBox(width: 10),
+                        Text('Continuar y subir evidencia'),
+                      ],
+                    ),
                   ),
                 ),
               ),

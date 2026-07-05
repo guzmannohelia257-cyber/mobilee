@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'theme/app_theme.dart';
 import 'theme/app_colors.dart';
 import 'widgets/brand_mark.dart';
 import 'screens/login_screen.dart';
-import 'screens/onboarding_screen.dart';
 import 'screens/conductor_home.dart';
 import 'screens/tecnico_dashboard_screen.dart';
 import 'screens/mis_vehiculos_screen.dart';
@@ -31,7 +31,6 @@ import 'screens/cliente_tracking_screen.dart';
 import 'screens/seleccionar_taller_login_screen.dart';
 import 'config/stripe_config.dart';
 import 'services/auth_service.dart';
-import 'services/onboarding_service.dart';
 import 'services/tecnico_auth_service.dart';
 import 'services/notification_service.dart';
 import 'services/realtime_service.dart';
@@ -109,16 +108,18 @@ class MyApp extends StatelessWidget {
       home: const _InitialScreen(),
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/onboarding': (context) => const OnboardingScreen(),
-        '/conductor-home': (context) => const ConductorHomeScreen(),
+        '/conductor-home': (context) => ShowCaseWidget(
+              builder: (context) => const ConductorHomeScreen(),
+            ),
         '/tecnico-home': (context) => const TecnicoDashboardScreen(),
         '/tecnico-dashboard': (context) => const TecnicoDashboardScreen(),
         '/mis-vehiculos': (context) => MisVehiculosScreen(),
         '/registrar-vehiculo': (context) => RegistrarVehiculoScreen(),
         '/debug-vehiculos': (context) => VehiculoDebugScreen(),
         '/perfil': (context) => const PerfilScreen(),
-        '/reportar-emergencia': (context) =>
-            const ReportarEmergenciaScreen(vehiculos: []),
+        '/reportar-emergencia': (context) => ShowCaseWidget(
+              builder: (context) => const ReportarEmergenciaScreen(vehiculos: []),
+            ),
         '/historial-emergencias': (context) {
           final abrir = ModalRoute.of(context)?.settings.arguments as int?;
           return HistorialEmergenciasScreen(abrirDetalle: abrir);
@@ -227,15 +228,6 @@ class _InitialScreenState extends State<_InitialScreen> {
     try {
       AppLogger.debug('Esperando 500ms antes de verificar...', tag: 'INITIAL_SCREEN');
       await Future.delayed(const Duration(milliseconds: 500));
-
-      // Gate de onboarding: primer arranque -> tutorial, luego nunca más.
-      final vistoOnboarding = await OnboardingService().yaVisto();
-      if (!vistoOnboarding) {
-        AppLogger.info('Onboarding no visto, mostrando tutorial inicial', tag: 'INITIAL_SCREEN');
-        if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed('/onboarding');
-        return;
-      }
 
       AppLogger.info('Verificando si hay sesión activa...', tag: 'INITIAL_SCREEN');
 

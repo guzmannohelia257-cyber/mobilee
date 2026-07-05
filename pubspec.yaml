@@ -79,6 +79,7 @@ dependencies:
 
   # UUID para idempotencia outbox (M8)
   uuid: ^4.4.2
+  showcaseview: ^5.1.0
 
 dev_dependencies:
   flutter_test:

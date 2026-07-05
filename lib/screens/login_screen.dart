@@ -344,6 +344,17 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // Segundo conductor demo (ver SETT/config.py, key "cli_demo_rapido2"):
+  // cuenta limpia, sin incidentes previos, pensada como acceso rapido
+  // alternativo para probar el flujo desde cero.
+  Future<void> _autoLoginConductor2() async {
+    AppLogger.separator(title: 'AUTO-LOGIN CONDUCTOR 2');
+    await _handleLoginWithCredentials(
+      'sebastian.conductor.demo@gmail.com',
+      'cliente2026#',
+    );
+  }
+
   void _irASelectorTallerTecnico() {
     AppLogger.info(
       'Tecnico: redirigiendo al selector de taller (M9)',
@@ -474,6 +485,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
               _DevTile(
+                icon: Icons.bolt_outlined,
+                title: 'Entrar como conductor demo 2',
+                subtitle: 'sebastian.conductor.demo@gmail.com',
+                onTap: () {
+                  Navigator.pop(sheetCtx);
+                  _autoLoginConductor2();
+                },
+              ),
+              _DevTile(
                 icon: Icons.handyman_outlined,
                 title: 'Acceso de técnico',
                 subtitle: 'Seleccionar taller',
@@ -491,6 +511,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   Navigator.pop(sheetCtx);
                   setState(() {
                     _emailController.text = 'ramiro.atendido.demo@gmail.com';
+                    _passwordController.text = 'cliente2026#';
+                  });
+                },
+              ),
+              _DevTile(
+                icon: Icons.edit_outlined,
+                title: 'Autorellenar conductor 2',
+                subtitle: 'sebastian.conductor.demo@gmail.com',
+                onTap: () {
+                  Navigator.pop(sheetCtx);
+                  setState(() {
+                    _emailController.text = 'sebastian.conductor.demo@gmail.com';
                     _passwordController.text = 'cliente2026#';
                   });
                 },
@@ -665,6 +697,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     _QuickCredRow(
                       disabled: _isLoading,
                       onConductor: _autoLoginConductor,
+                      onConductor2: _autoLoginConductor2,
                       onTecnico: _irASelectorTallerTecnico,
                     ),
                   ],
@@ -950,17 +983,22 @@ class _DevTile extends StatelessWidget {
 class _QuickCredRow extends StatelessWidget {
   final bool disabled;
   final VoidCallback onConductor;
+  final VoidCallback onConductor2;
   final VoidCallback onTecnico;
 
   const _QuickCredRow({
     required this.disabled,
     required this.onConductor,
+    required this.onConductor2,
     required this.onTecnico,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 6,
+      runSpacing: 8,
       children: [
         Text(
           'DEMO',
@@ -971,13 +1009,17 @@ class _QuickCredRow extends StatelessWidget {
             color: AppColors.inkFaint,
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 4),
         _Chip(
-          label: 'Conductor',
+          label: 'Conductor 1',
           icon: Icons.directions_car_outlined,
           onTap: disabled ? null : onConductor,
         ),
-        const SizedBox(width: 6),
+        _Chip(
+          label: 'Conductor 2',
+          icon: Icons.directions_car_filled_outlined,
+          onTap: disabled ? null : onConductor2,
+        ),
         _Chip(
           label: 'Técnico',
           icon: Icons.handyman_outlined,

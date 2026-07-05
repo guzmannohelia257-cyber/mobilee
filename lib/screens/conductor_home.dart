@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/incidente_service.dart';
 import '../services/taller_service.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../services/vehiculo_service.dart';
 import '../services/offline/wizard_draft_service.dart';
+import '../services/tour_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/connection_badge.dart';
@@ -26,6 +28,8 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
   bool _isLoading = true;
   IncidenteDetalle? _incidenteActivo;
   bool _cargandoIncidente = true;
+  final GlobalKey _keyBotonSolicitar = GlobalKey();
+  bool _mostrarSaltarTour = false;
 
   @override
   void initState() {
@@ -34,6 +38,28 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
     _cargarIncidenteActivo();
     // Tras abrir, si hay un reporte a medias, ofrecer reanudarlo.
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkReporteEnCurso());
+  }
+
+  /// Dispara el spotlight del tour SOLO si: (a) no hay incidente activo (el
+  /// botón "Solicitar asistencia" existe y se está mostrando) y (b) el tour
+  /// aún no fue visto. Se llama al final de `_cargarIncidenteActivo()`
+  /// (después de su `setState`), nunca desde `initState` directo, porque
+  /// `_incidenteActivo` recién se resuelve tras la llamada async al backend.
+  Future<void> _dispararTourSiCorresponde() async {
+    if (_incidenteActivo != null) return; // sin botón que resaltar hoy
+    final visto = await TourService().yaVisto();
+    if (visto || !mounted) return;
+    setState(() => _mostrarSaltarTour = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ShowCaseWidget.of(context).startShowCase([_keyBotonSolicitar]);
+    });
+  }
+
+  Future<void> _saltarTour() async {
+    await TourService().saltarTour();
+    if (!mounted) return;
+    setState(() => _mostrarSaltarTour = false);
+    ShowCaseWidget.of(context).dismiss();
   }
 
   /// Si quedo un reporte sin terminar, pregunta si continuar y reanuda el paso.
@@ -129,14 +155,21 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ReportarEmergenciaScreen(
-          vehiculos: vehiculos ?? const [],
-          idVehiculoInicial: d.idVehiculo,
-          descripcionInicial: d.descripcion,
-          latitudInicial: d.latitud,
-          longitudInicial: d.longitud,
-          ubicacionTextoInicial: d.ubicacionTexto,
-          idempotencyKey: d.idempotencyKey,
+        // ShowCaseWidget propio: ReportarEmergenciaScreen dispara su propio
+        // spotlight en initState() y necesita un ancestro; esta pantalla se
+        // llega vía MaterialPageRoute directo, NO por la ruta nombrada
+        // '/reportar-emergencia' (esa la usa historial_emergencias_screen.dart).
+        builder: (_) => ShowCaseWidget(
+          onFinish: () => TourService().marcarVisto(),
+          builder: (_) => ReportarEmergenciaScreen(
+            vehiculos: vehiculos ?? const [],
+            idVehiculoInicial: d.idVehiculo,
+            descripcionInicial: d.descripcion,
+            latitudInicial: d.latitud,
+            longitudInicial: d.longitud,
+            ubicacionTextoInicial: d.ubicacionTexto,
+            idempotencyKey: d.idempotencyKey,
+          ),
         ),
       ),
     );
@@ -183,6 +216,7 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       _incidenteActivo = activo;
       _cargandoIncidente = false;
     });
+    _dispararTourSiCorresponde();
   }
 
   /// True si el incidente sigue en curso (no atendido/cancelado/borrador).
@@ -286,7 +320,17 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ReportarEmergenciaScreen(vehiculos: vehiculos),
+          // ShowCaseWidget propio: este es el camino REAL que sigue el botón
+          // "Solicitar asistencia" (Paso 1 del tour). ReportarEmergenciaScreen
+          // dispara su propio spotlight en initState() y necesita un
+          // ShowCaseWidget ancestro — no llega por la ruta nombrada
+          // '/reportar-emergencia' de main.dart, así que hay que envolverla
+          // aquí explícitamente o ShowCaseWidget.of(context) lanza una
+          // excepción ("Please provide a context that has ShowCaseWidget").
+          builder: (context) => ShowCaseWidget(
+            onFinish: () => TourService().marcarVisto(),
+            builder: (context) => ReportarEmergenciaScreen(vehiculos: vehiculos),
+          ),
         ),
       );
       if (mounted) _cargarIncidenteActivo();
@@ -306,34 +350,59 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
       backgroundColor: AppColors.background,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              bottom: false,
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                children: [
-                  _buildTopBar(),
-                  const SizedBox(height: 22),
-                  _buildGreeting(),
-                  const SizedBox(height: 22),
-                  _incidenteActivo != null
-                      ? _buildActiveIncidentCard(_incidenteActivo!)
-                      : _buildEmergencyCard(),
-                  const SizedBox(height: 16),
-                  _buildFeatureCards(),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: TextButton.icon(
-                      onPressed: _handleLogout,
-                      icon: const Icon(Icons.logout_rounded, size: 18),
-                      label: const Text('Cerrar sesión'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.inkMuted,
+          : Stack(
+              children: [
+                SafeArea(
+                  bottom: false,
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                    children: [
+                      _buildTopBar(),
+                      const SizedBox(height: 22),
+                      _buildGreeting(),
+                      const SizedBox(height: 22),
+                      _incidenteActivo != null
+                          ? _buildActiveIncidentCard(_incidenteActivo!)
+                          : _buildEmergencyCard(),
+                      const SizedBox(height: 16),
+                      _buildFeatureCards(),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: _handleLogout,
+                          icon: const Icon(Icons.logout_rounded, size: 18),
+                          label: const Text('Cerrar sesión'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.inkMuted,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_mostrarSaltarTour)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: TextButton(
+                          onPressed: _saltarTour,
+                          style: TextButton.styleFrom(
+                            backgroundColor: AppColors.surface,
+                            foregroundColor: AppColors.inkMuted,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                          ),
+                          child: const Text('Saltar'),
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
       bottomNavigationBar: _isLoading ? null : _buildBottomNav(),
     );
@@ -468,10 +537,18 @@ class _ConductorHomeScreenState extends State<ConductorHomeScreen> {
           const SizedBox(height: 18),
           SizedBox(
             width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: _reportarEmergencia,
-              icon: const Icon(Icons.add_alert_rounded, size: 20),
-              label: const Text('Solicitar asistencia'),
+            child: Showcase(
+              key: _keyBotonSolicitar,
+              description: 'Toca aquí para pedir ayuda y documentar tu emergencia.',
+              disposeOnTap: true,
+              onTargetClick: () {
+                _reportarEmergencia();
+              },
+              child: FilledButton.icon(
+                onPressed: _reportarEmergencia,
+                icon: const Icon(Icons.add_alert_rounded, size: 20),
+                label: const Text('Solicitar asistencia'),
+              ),
             ),
           ),
         ],

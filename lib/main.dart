@@ -18,6 +18,8 @@ import 'screens/perfil_screen.dart';
 import 'screens/reportar_emergencia_screen.dart';
 import 'screens/historial_emergencias_screen.dart';
 import 'screens/mis_pagos_screen.dart';
+import 'screens/billetera_screen.dart';
+import 'screens/referidos_screen.dart';
 import 'screens/asignacion_detalle_screen.dart';
 import 'screens/mensajes_screen.dart';
 import 'screens/notificaciones_screen.dart';
@@ -122,6 +124,8 @@ class MyApp extends StatelessWidget {
           return HistorialEmergenciasScreen(abrirDetalle: abrir);
         },
         '/mis-pagos': (context) => const MisPagosScreen(),
+        '/billetera': (context) => const BilleteraScreen(),
+        '/referidos': (context) => const ReferidosScreen(),
         '/notificaciones': (context) => const NotificacionesScreen(),
         '/calificar-servicio': (context) {
           final id = ModalRoute.of(context)?.settings.arguments as int?;

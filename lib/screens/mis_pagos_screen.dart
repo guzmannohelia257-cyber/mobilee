@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_emergencias/theme/app_colors.dart';
 
 import '../models/pago_cliente_item.dart';
+import '../services/billetera_service.dart';
 import '../services/pagos_service.dart';
 import '../utils/app_logger.dart';
 
@@ -19,6 +20,7 @@ class MisPagosScreen extends StatefulWidget {
 class _MisPagosScreenState extends State<MisPagosScreen>
     with SingleTickerProviderStateMixin {
   final PagosService _pagosService = PagosService();
+  final BilleteraService _billeteraService = BilleteraService();
   static const String _tag = 'MIS_PAGOS';
 
   late TabController _tabController;
@@ -26,12 +28,24 @@ class _MisPagosScreenState extends State<MisPagosScreen>
   String? _error;
   List<PagoClienteItem> _pendientes = [];
   List<PagoClienteItem> _completados = [];
+  double _saldoBilletera = 0;
+  // Ids de incidente (pendientes) para los que el usuario activó "usar saldo".
+  final Set<int> _usarSaldoIds = {};
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _cargarPagos();
+    _cargarSaldo();
+  }
+
+  Future<void> _cargarSaldo() async {
+    final resultado = await _billeteraService.saldo();
+    if (!mounted) return;
+    if (resultado['success'] == true) {
+      setState(() => _saldoBilletera = resultado['saldo'] as double);
+    }
   }
 
   @override
@@ -82,10 +96,13 @@ class _MisPagosScreenState extends State<MisPagosScreen>
         'Iniciando pago. Incidente: ${item.idIncidente}, Monto: ${item.montoTotal}',
         tag: _tag,
       );
-      // 1. Crear PaymentIntent en el backend
+      // 1. Crear PaymentIntent en el backend (usando saldo de billetera si el
+      // usuario activó el toggle para este incidente).
+      final usarSaldo = _usarSaldoIds.contains(item.idIncidente);
       final intentResult = await _pagosService.crearPaymentIntent(
         idIncidente: item.idIncidente,
         montoTotal: item.montoTotal,
+        usarSaldo: usarSaldo,
       );
 
       if (!mounted) return;
@@ -94,6 +111,22 @@ class _MisPagosScreenState extends State<MisPagosScreen>
         loadingOverlay.remove();
         AppLogger.warning('Fallo al crear PaymentIntent: ${intentResult['error']}', tag: _tag);
         _mostrarError(intentResult['error']?.toString() ?? 'Error al crear pago');
+        return;
+      }
+
+      // El saldo cubrió el 100% del pago: no hay que abrir Stripe.
+      if (intentResult['pagado_con_saldo'] == true) {
+        loadingOverlay.remove();
+        AppLogger.success('Pago cubierto con saldo de billetera', tag: _tag);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('¡Pago completado con tu saldo!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        _usarSaldoIds.remove(item.idIncidente);
+        await _cargarPagos();
+        await _cargarSaldo();
         return;
       }
 
@@ -148,7 +181,9 @@ class _MisPagosScreenState extends State<MisPagosScreen>
         ),
       );
 
+      _usarSaldoIds.remove(item.idIncidente);
       await _cargarPagos();
+      await _cargarSaldo();
     } on StripeException catch (e) {
       loadingOverlay.remove();
       if (!mounted) return;
@@ -347,6 +382,24 @@ class _MisPagosScreenState extends State<MisPagosScreen>
                       ),
                     ),
                   if (showPagarBtn) ...[
+                    if (_saldoBilletera > 0)
+                      CheckboxListTile(
+                        value: _usarSaldoIds.contains(item.idIncidente),
+                        onChanged: (v) => setState(() {
+                          if (v ?? false) {
+                            _usarSaldoIds.add(item.idIncidente);
+                          } else {
+                            _usarSaldoIds.remove(item.idIncidente);
+                          }
+                        }),
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        dense: true,
+                        title: Text(
+                          'Usar mi saldo (${_monto(_saldoBilletera)})',
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ),
                     const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,

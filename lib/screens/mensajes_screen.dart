@@ -26,6 +26,8 @@ class _MensajesScreenState extends State<MensajesScreen> {
   bool _cargando = true;
   bool _enviando = false;
   Timer? _timer;
+  // Ids de mensajes cuyo texto original está expandido ("ver original").
+  final Set<int> _verOriginal = {};
 
   @override
   void initState() {
@@ -159,12 +161,46 @@ class _MensajesScreenState extends State<MensajesScreen> {
             ),
             const SizedBox(height: 2),
             Text(
-              m.contenido,
+              m.traducido ? (m.contenidoTraducido ?? m.contenido) : m.contenido,
               style: TextStyle(
                 color: esMio ? Colors.white : Colors.black87,
                 fontSize: 14,
               ),
             ),
+            if (m.traducido) ...[
+              const SizedBox(height: 4),
+              GestureDetector(
+                onTap: () => setState(() {
+                  if (_verOriginal.contains(m.idMensaje)) {
+                    _verOriginal.remove(m.idMensaje);
+                  } else {
+                    _verOriginal.add(m.idMensaje);
+                  }
+                }),
+                child: Text(
+                  _verOriginal.contains(m.idMensaje)
+                      ? 'Ocultar original'
+                      : '🌐 ver original (${m.idiomaOrigen ?? '?'})',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    decoration: TextDecoration.underline,
+                    color: esMio ? Colors.white70 : Colors.grey.shade600,
+                  ),
+                ),
+              ),
+              if (_verOriginal.contains(m.idMensaje))
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    m.contenido,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontStyle: FontStyle.italic,
+                      color: esMio ? Colors.white60 : Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+            ],
             const SizedBox(height: 4),
             Text(
               hora,

@@ -21,7 +21,18 @@ class _EditarPerfilScreenState extends State<EditarPerfilScreen> {
   
   bool guardando = false;
   String? errorGeneral;
-  
+
+  // Idiomas soportados para la traducción del chat (feature turistas).
+  static const Map<String, String> _idiomas = {
+    'es': 'Español',
+    'en': 'English',
+    'pt': 'Português',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'it': 'Italiano',
+  };
+  String? _idiomaSel;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +45,8 @@ class _EditarPerfilScreenState extends State<EditarPerfilScreen> {
     _telefonoController = TextEditingController(
       text: widget.usuarioInicial['telefono'] ?? ''
     );
+    final idioma = widget.usuarioInicial['idioma_preferido'] as String?;
+    _idiomaSel = (idioma != null && _idiomas.containsKey(idioma)) ? idioma : 'es';
   }
   
   @override
@@ -55,9 +68,10 @@ class _EditarPerfilScreenState extends State<EditarPerfilScreen> {
     final resultado = await usuarioService.actualizarPerfil(
       nombre: _nombreController.text.trim(),
       email: _emailController.text.trim(),
-      telefono: _telefonoController.text.trim().isEmpty 
-        ? null 
+      telefono: _telefonoController.text.trim().isEmpty
+        ? null
         : _telefonoController.text.trim(),
+      idiomaPreferido: _idiomaSel,
     );
     
     if (!mounted) return;
@@ -205,8 +219,33 @@ class _EditarPerfilScreenState extends State<EditarPerfilScreen> {
                 },
                 enabled: !guardando,
               ),
+              SizedBox(height: 20),
+
+              // Idioma preferido del chat (traducción para turistas)
+              Text(
+                'Idioma del chat',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: _idiomaSel,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: Icon(Icons.translate),
+                ),
+                items: _idiomas.entries
+                    .map((e) => DropdownMenuItem(
+                          value: e.key,
+                          child: Text(e.value),
+                        ))
+                    .toList(),
+                onChanged:
+                    guardando ? null : (v) => setState(() => _idiomaSel = v),
+              ),
               SizedBox(height: 32),
-              
+
               // Botones
               Row(
                 children: [

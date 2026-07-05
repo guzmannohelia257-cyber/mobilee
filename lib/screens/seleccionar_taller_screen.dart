@@ -5,6 +5,7 @@ import '../models/categoria.dart';
 import '../models/taller.dart';
 import '../services/incidente_service.dart';
 import '../services/offline/wizard_draft_service.dart';
+import '../services/referido_service.dart';
 import '../services/taller_service.dart';
 
 /// Pantalla M1: cliente ve talleres compatibles con la categoria detectada
@@ -36,16 +37,34 @@ class SeleccionarTallerScreen extends StatefulWidget {
 class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
   final _svc = TallerService();
   final _incidenteService = IncidenteService();
+  final _referidoService = ReferidoService();
   bool _cargando = true;
   String? _error;
   List<TallerCompatible> _talleres = [];
   double _radioKm = 20;
   bool _confirmando = false;
 
+  // Cupón de referido (opcional): el mejor disponible (mayor %). Si es null,
+  // el check "usar cupón" se oculta por completo.
+  CuponModel? _cuponDisponible;
+  bool _usarCupon = false;
+
   @override
   void initState() {
     super.initState();
     _cargar();
+    _cargarCupon();
+  }
+
+  Future<void> _cargarCupon() async {
+    final resultado = await _referidoService.misCupones();
+    if (!mounted) return;
+    if (resultado['success'] == true) {
+      final cupones = List<CuponModel>.from(resultado['items'] ?? []);
+      if (cupones.isEmpty) return;
+      cupones.sort((a, b) => b.porcentaje.compareTo(a.porcentaje));
+      setState(() => _cuponDisponible = cupones.first);
+    }
   }
 
   @override
@@ -159,6 +178,7 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
     final res = await _incidenteService.confirmarIncidencia(
       idIncidente: widget.idIncidente!,
       idTallerPreferido: t.idTaller,
+      idCupon: _usarCupon ? _cuponDisponible?.idCupon : null,
     );
 
     if (!mounted) return;
@@ -257,6 +277,16 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
               ),
             ]),
           ),
+          if (_cuponDisponible != null)
+            CheckboxListTile(
+              value: _usarCupon,
+              onChanged: (v) => setState(() => _usarCupon = v ?? false),
+              title: Text('Usar cupón del ${_cuponDisponible!.porcentaje}%'),
+              subtitle: const Text('Se aplicará al total del servicio que elijas'),
+              controlAffinity: ListTileControlAffinity.leading,
+              activeColor: AppColors.brand,
+              dense: true,
+            ),
           Expanded(child: _buildContenido()),
         ],
       ),
@@ -318,10 +348,31 @@ class _SeleccionarTallerScreenState extends State<SeleccionarTallerScreen> {
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               if (t.totalEstimado != null) ...[
-                Text(
-                  'Total estimado: Bs ${t.totalEstimado!.toStringAsFixed(2)}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+                if (_usarCupon && _cuponDisponible != null)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Bs ${t.totalEstimado!.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Total con cupón: Bs '
+                        '${(t.totalEstimado! * (1 - _cuponDisponible!.porcentaje / 100)).toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.brand),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    'Total estimado: Bs ${t.totalEstimado!.toStringAsFixed(2)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 if (t.tarifaBase != null && t.montoTraslado != null && t.montoTraslado! > 0)
                   Text(
                     'Servicio Bs ${t.tarifaBase!.toStringAsFixed(0)} + traslado Bs ${t.montoTraslado!.toStringAsFixed(2)}',

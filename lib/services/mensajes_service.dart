@@ -11,9 +11,15 @@ class MensajeModel {
   final int idIncidente;
   final int? idUsuario;
   final int? idTaller;
-  final String contenido;
+  final String contenido; // SIEMPRE el texto original
   final bool leido;
   final DateTime createdAt;
+
+  // Traducción al idioma del receptor (feature turistas).
+  final String? contenidoTraducido;
+  final String? idiomaOrigen;
+  final String? idiomaDestino;
+  final bool traducido;
 
   MensajeModel({
     required this.idMensaje,
@@ -23,6 +29,10 @@ class MensajeModel {
     required this.contenido,
     required this.leido,
     required this.createdAt,
+    this.contenidoTraducido,
+    this.idiomaOrigen,
+    this.idiomaDestino,
+    this.traducido = false,
   });
 
   factory MensajeModel.fromJson(Map<String, dynamic> j) => MensajeModel(
@@ -33,6 +43,10 @@ class MensajeModel {
         contenido: j['contenido'] as String,
         leido: j['leido'] as bool,
         createdAt: DateTime.parse(j['created_at'] as String),
+        contenidoTraducido: j['contenido_traducido'] as String?,
+        idiomaOrigen: j['idioma_origen'] as String?,
+        idiomaDestino: j['idioma_destino'] as String?,
+        traducido: (j['traducido'] as bool?) ?? false,
       );
 }
 

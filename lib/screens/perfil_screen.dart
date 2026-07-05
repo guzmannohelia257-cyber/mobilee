@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/billetera_service.dart';
 import '../services/onboarding_service.dart';
 import '../services/usuario_service.dart';
 import '../theme/app_colors.dart';
@@ -14,15 +15,26 @@ class PerfilScreen extends StatefulWidget {
 
 class _PerfilScreenState extends State<PerfilScreen> {
   final usuarioService = UsuarioService();
+  final billeteraService = BilleteraService();
 
   Map<String, dynamic>? usuario;
   bool cargando = true;
   String? error;
+  double? saldoBilletera;
 
   @override
   void initState() {
     super.initState();
     cargarPerfil();
+    _cargarSaldo();
+  }
+
+  Future<void> _cargarSaldo() async {
+    final resultado = await billeteraService.saldo();
+    if (!mounted) return;
+    if (resultado['success'] == true) {
+      setState(() => saldoBilletera = resultado['saldo'] as double);
+    }
   }
 
   void cargarPerfil() async {
@@ -299,6 +311,22 @@ class _PerfilScreenState extends State<PerfilScreen> {
               ),
               child: Column(
                 children: [
+                  _ActionRow(
+                    icon: Icons.account_balance_wallet_outlined,
+                    title: 'Mi billetera',
+                    subtitle: saldoBilletera != null
+                        ? 'Saldo: Bs ${saldoBilletera!.toStringAsFixed(2)}'
+                        : 'Recarga y consulta tu saldo',
+                    onTap: () => Navigator.pushNamed(context, '/billetera'),
+                  ),
+                  const _RowDivider(),
+                  _ActionRow(
+                    icon: Icons.card_giftcard_outlined,
+                    title: 'Referidos',
+                    subtitle: 'Comparte tu código y gana cupones',
+                    onTap: () => Navigator.pushNamed(context, '/referidos'),
+                  ),
+                  const _RowDivider(),
                   _ActionRow(
                     icon: Icons.edit_outlined,
                     title: 'Editar mi información',

@@ -162,6 +162,7 @@ class IncidenteService {
   Future<Map<String, dynamic>> confirmarIncidencia({
     required int idIncidente,
     int? idTallerPreferido,
+    int? idCupon,
   }) async {
     try {
       final token = await _getToken();
@@ -172,6 +173,9 @@ class IncidenteService {
       final body = <String, dynamic>{};
       if (idTallerPreferido != null) {
         body['id_taller_preferido'] = idTallerPreferido;
+      }
+      if (idCupon != null) {
+        body['id_cupon'] = idCupon;
       }
 
       final response = await http

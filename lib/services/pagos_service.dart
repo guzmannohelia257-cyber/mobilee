@@ -88,6 +88,7 @@ class PagosService {
     required int idIncidente,
     required double montoTotal,
     int idMetodoPago = 1,
+    bool usarSaldo = false,
   }) async {
     try {
       final token = await _getToken();
@@ -101,6 +102,7 @@ class PagosService {
         'id_incidente': idIncidente,
         'monto_total': montoTotal,
         'id_metodo_pago': idMetodoPago,
+        'usar_saldo': usarSaldo,
       };
       AppLogger.httpRequest('POST', url, tag: _tag, headers: {
         'Authorization': 'Bearer ***',
@@ -128,9 +130,11 @@ class PagosService {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         return {
           'success': true,
-          'client_secret': data['client_secret'] as String,
-          'payment_intent_id': data['payment_intent_id'] as String,
-          'monto_centavos': data['monto_centavos'] as int,
+          'pagado_con_saldo': (data['pagado_con_saldo'] as bool?) ?? false,
+          'monto_saldo_aplicado': (data['monto_saldo_aplicado'] as num?)?.toDouble() ?? 0.0,
+          'client_secret': data['client_secret'] as String?,
+          'payment_intent_id': data['payment_intent_id'] as String?,
+          'monto_centavos': data['monto_centavos'] as int?,
         };
       }
 

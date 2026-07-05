@@ -79,6 +79,7 @@ class UsuarioService {
     required String nombre,
     required String email,
     String? telefono,
+    String? idiomaPreferido,
   }) async {
     try {
       debugPrint('\n👤 === ACTUALIZANDO PERFIL ===');
@@ -94,6 +95,9 @@ class UsuarioService {
         'email': email,
         'telefono': telefono,
       };
+      if (idiomaPreferido != null) {
+        body['idioma_preferido'] = idiomaPreferido;
+      }
       
       debugPrint('📤 Body: $body');
       
